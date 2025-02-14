@@ -4,3 +4,8 @@
     <p class="text-center">This is a simple PHP project with Bootstrap and jQuery.</p>
 </div>
 <?php include 'includes/footer.php'; ?>
+
+<?php
+include 'config.php'; // Load .env file
+
+
