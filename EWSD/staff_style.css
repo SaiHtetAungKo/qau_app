@@ -1,0 +1,123 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    background: #8364a8;
+    color: white;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    padding: 10px;
+    text-align: center;
+    background: #eee;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+nav ul li.active {
+    background: #8bd3c7;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: black;
+    display: block;
+    font-weight: bold;
+}
+
+.user-profile {
+    text-align: center;
+    margin-top: auto;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    background: gray;
+    border-radius: 50%;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.user-info p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.user-profile a {
+    display: inline-block;
+    margin-top: 10px;
+    color: white;
+    text-decoration: none;
+    background: #ff4d4d;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.user-profile a:hover {
+    background: #cc0000;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    background: white;
+}
+
+.search-bar {
+    background: #d1b3e0;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto; /* Centers the search bar */
+    box-sizing: border-box;
+}
+
+.search-bar input {
+    width: 95%; /* Ensures input stays inside the purple box */
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+
+
+.idea-list {
+    margin-top: 20px;
+}
