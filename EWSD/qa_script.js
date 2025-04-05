@@ -68,3 +68,33 @@ function checkPasswordStrength() {
         registerBtn.disabled = false;
     }
 }
+
+document.querySelectorAll('.status-toggle-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const departmentId = this.dataset.id;
+        const currentStatus = this.dataset.status;
+        const buttonElement = this;
+
+        fetch('toggle_status.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `id=${departmentId}&status=${currentStatus}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the button text and data attribute
+                buttonElement.textContent = data.new_status === 'Active' ? 'Deactivate' : 'Activate';
+                buttonElement.dataset.status = data.new_status;
+
+                // Also update the status cell text if needed
+                const statusCell = buttonElement.closest('tr').querySelector('td:nth-child(4)');
+                statusCell.textContent = data.new_status;
+            } else {
+                alert('Failed to update status');
+            }
+        });
+    });
+});
