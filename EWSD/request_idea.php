@@ -110,4 +110,5 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
     </div>
 </body>
 
+
 </html>
