@@ -9,7 +9,7 @@
         echo "<script> window.location= 'index.php' </script>";
     }
 
-    // Mock data for categories
+    // Mock category data
     $categories = [
         'popular' => [
             ['title' => 'Cleaning & Maintenance', 'details' => ['Restroom Cleaning', 'Classroom Cleaning', 'Office Cleaning', 'Hallways & Staircase Cleaning', 'Outdoor Cleaning & Gardening']],
@@ -22,244 +22,293 @@
             ['title' => 'Parking & Transportation', 'details' => ['Parking Issues', 'Ferry Transportation']]
         ]
     ];
+
+    // Mock department data
+    $departments = [
+        ['name' => 'Department A', 'ideas' => 100, 'percentage' => '80%', 'contributors' => 18],
+        ['name' => 'Department B', 'ideas' => 120, 'percentage' => '75%', 'contributors' => 21],
+        ['name' => 'Department C', 'ideas' => 90, 'percentage' => '85%', 'contributors' => 14],
+        ['name' => 'Department D', 'ideas' => 110, 'percentage' => '78%', 'contributors' => 20],
+        ['name' => 'Department E', 'ideas' => 95, 'percentage' => '88%', 'contributors' => 17],
+        ['name' => 'Department F', 'ideas' => 80, 'percentage' => '65%', 'contributors' => 10],
+        ['name' => 'Department G', 'ideas' => 80, 'percentage' => '65%', 'contributors' => 10],
+        ['name' => 'Department H', 'ideas' => 80, 'percentage' => '65%', 'contributors' => 10]
+    ];
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QA Manager Category List Page</title>
+    <title>QA Manager Category and Idea Report</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
-   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        * {
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: white;
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            color: black;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #ddd;
+            border: none;
+            color: black;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: rgb(89, 64, 122);
+            color: white;
+        }
+
+        .logout {
+            margin-top: auto;
+            background: #3c9a72;
+            padding: 12px;
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout:hover {
+            background: rgb(89, 64, 122);
+        }
+
+        .content {
+            flex: 1;
+            background: rgb(89, 64, 122);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            width: 50%;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .user-info {
+            text-align: right;
+            margin-right: 21px;
+        }
+
+        header a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: white;
+            color: black;
+            padding: 30px 20px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .arrow, .delete {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .delete {
+            color: red;
+        }
+
+        /* Section visibility */
+        #category-sections,
+        #idea-report-section {
+            display: none;
+        }
+
+        /* Download section */
+        .download-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-section p {
+            font-weight: bold;
+        }
+
+        .download-btn {
+            background: #aee0d3;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .green-box {
+    width: 40px;
+    height: 40px;
+    background-color: #90d5c9;
+    border-radius: 12px;
+    margin-bottom: 10px;
 }
 
-.container {
-    display: flex;
-    height: 100vh;
-}
-
-.sidebar {
-    width: 250px;
-    background: white;
-    color: black;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.sidebar h2 {
-    margin-bottom: 20px;
-}
-
-.btn {
-    width: 100%;
-    padding: 12px; /* Slightly increased padding for a more comfortable look */
-    margin: 10px 0;
-    background: #ddd;
-    border: none;
-    color: black;
-    cursor: pointer;
-    text-align: center; /* Center the text inside the button */
-    font-family: 'Poppins', sans-serif; /* Apply Poppins font to buttons */
-    font-size: 16px; /* Adjust font size for readability */
-    border-radius: 10px; /* Set the corner radius to 10px */
-    transition: background 0.3s, color 0.3s;
-}
-
-.btn:hover {
-    background: rgb(89, 64, 122);
-    color: white;
-}
-
-.logout {
-    margin-top: auto;
-    background: #3c9a72;
-    padding: 12px; /* Consistent padding */
-    border: none;
-    color: white;
-    cursor: pointer;
-    width: 100%;
-    text-align: center; /* Center the text inside the button */
-    font-family: 'Poppins', sans-serif; /* Apply Poppins font */
-    font-size: 16px; /* Adjust font size */
-    border-radius: 10px; /* Set the corner radius to 10px */
-    transition: background 0.3s, color 0.3s;
-}
-
-.logout:hover {
-    background: rgb(89, 64, 122); /* Change color on hover */
-    color: white;
-}
-
-
-.content {
-    flex: 1;
-    padding: 20px;
-    background: rgb(89, 64, 122);
-    color: white;
-    overflow-y: auto; /* Prevents any content from overflowing the container */
-    box-sizing: border-box; /* Ensures padding is included within the container's size */
-}
-
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap; /* Allow the elements to wrap and not overflow */
-}
-
-input[type="text"] {
-    padding: 10px;
-    width: 50%;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-/* Styling for the user info section */
-/* User Info Section: Stack Name and QA Manager vertically and center-align */
-/* User Info Section: Stack Name and QA Manager vertically and center-align */
-.user-info {
-    display: flex;
-    flex-direction: column; /* Stack Name and QA Manager vertically */
-    align-items: center; /* Center the text horizontally in the vertical stack */
-    gap: 5px; /* Add space between 'Name' and 'QA Manager' */
-    margin-right: 21px; /* Adjusted margin to 21px */
-}
-
-
-
-.categories {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.category-card {
-    background: #fff;
-    padding: 52px 91px 46px 36px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-    color: black;
-    overflow: hidden; /* To ensure no image spills out */
-}
-
-.category-image {
-    width: 50px; /* Set width to 50px */
-    height: 50px; /* Set height to 50px */
-    object-fit: cover; /* Ensure the image covers the space without distortion */
-    border-radius: 5px; /* Optional: rounded corners for the image */
-}
-
-
-
-.arrow {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.delete {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-size: 20px;
-    color: red;
-    cursor: pointer;
-}
-
-.popular-categories, .unused-categories {
-    margin-bottom: 25px;
-}
-
-input[type="text"] {
-    padding: 12px; /* Increased padding for more space */
-    width: 50%;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px; /* Increased font size for better readability */
-    box-sizing: border-box; /* Ensures padding doesn't mess with the width */
-    transition: border-color 0.3s ease; /* Smooth transition for border color */
-}
-
-input[type="text"]:focus {
-    border-color: #3c9a72; /* Highlight border color on focus */
-    outline: none; /* Remove default outline */
-}
-
-header a {
-    display: inline-block;
-    color: white; /* Set the text color */
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    text-decoration: underline; /* Underline the text */
-    padding: 0; /* Remove padding since we no longer need it */
-    background: none; /* Remove background */
-    text-align: center;
-    transition: color 0.3s; /* Transition color on hover */
-}
-
-</style>
-
+    </style>
 </head>
 <body>
     <div class="container">
         <aside class="sidebar">
             <h2>Logo</h2>
-            <button class="btn">Categories</button>
-            <button class="btn">Idea Reports</button>
-            <button class="logout">Log Out</button>
+            <button class="btn" onclick="toggleCategories()">Categories</button>
+            <button class="btn" onclick="toggleIdeaReports()">Idea Reports</button>
+            <button class="logout" onclick="confirmLogout()">Log Out</button>
         </aside>
+
         <main class="content">
-        <header>
-    <input type="text" placeholder="Search Categories">
-    <div class="user-info">
-        <span>Name</span>
-        <span>QA Manager</span>
-    </div>
-    <a href="#">Add new category</a>
-</header>
-<section>
-        <h3>Popular Categories</h3>
-        <div class="categories">
-            <?php foreach ($categories['popular'] as $category) { ?>
-                <div class="category-card">
-                    <!-- Image Integration -->
-                    <img src="images/dummy_category.png" alt="Category Image" class="category-image">
-                    
-                    <h4><?php echo $category['title']; ?></h4>
-                    <p><?php echo implode(', ', $category['details']); ?></p>
-                    <span class="arrow">&rarr;</span>
+            <header>
+                <input type="text" placeholder="Search">
+                <div class="user-info">
+                    <span><strong>Name</strong></span><br>
+                    <span>QA Manager</span>
                 </div>
-            <?php } ?>
-        </div>
-        <h3>Unused Categories</h3>
-        <div class="categories">
-            <?php foreach ($categories['unused'] as $category) { ?>
-                <div class="category-card">
-                    <!-- Image Integration -->
-                    <img src="images/dummy_category.png" alt="Category Image" class="category-image">
-                    <h4><?php echo $category['title']; ?></h4>
-                    <p><?php echo implode(', ', $category['details']); ?></p>
-                    <span class="delete">&#128465;</span>
+                <a href="add_category.php">Add new category</a>
+            </header>
+
+            <!-- Category Section -->
+            <!-- Category Section -->
+<div id="category-sections" style="display: block;">
+
+                <h3>Popular Categories</h3>
+                <div class="categories">
+                    <?php foreach ($categories['popular'] as $cat) { ?>
+                        <div class="category-card">
+                            <img src="images/dummy_category.png" alt="" class="category-image">
+                            <h4><?php echo $cat['title']; ?></h4>
+                            <p><?php echo implode(', ', $cat['details']); ?></p>
+                            <span class="arrow">&rarr;</span>
+                        </div>
+                    <?php } ?>
                 </div>
-            <?php } ?>
-        </div>
-    </section>
+
+                <h3>Unused Categories</h3>
+                <div class="categories">
+                    <?php foreach ($categories['unused'] as $cat) { ?>
+                        <div class="category-card">
+                            <img src="images/dummy_category.png" alt="" class="category-image">
+                            <h4><?php echo $cat['title']; ?></h4>
+                            <p><?php echo implode(', ', $cat['details']); ?></p>
+                            <span class="delete">&#128465;</span>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+
+            <!-- Idea Report Section -->
+            <div id="idea-report-section">
+                <h2>Idea Reports by Each Department</h2>
+                <div class="categories">
+                    <?php foreach ($departments as $dept) { ?>
+                        <div class="category-card">
+                        <div class="green-box"></div>
+
+                            <h4><?php echo $dept['name']; ?></h4>
+                            <p>
+                                Total Number of ideas: <?php echo $dept['ideas']; ?><br>
+                                Percentage of ideas: <?php echo $dept['percentage']; ?><br>
+                                Number of contributors: <?php echo $dept['contributors']; ?>
+                            </p>
+                            <span class="arrow">&rarr;</span>
+                        </div>
+                    <?php } ?>
+                </div>
+
+                <div class="download-section">
+                    <p>You can download only after final closure date</p>
+                    <button class="download-btn">&#8681; Download</button>
+                </div>
+            </div>
         </main>
     </div>
+
+    <script>
+        function toggleCategories() {
+            document.getElementById("category-sections").style.display = "block";
+            document.getElementById("idea-report-section").style.display = "none";
+        }
+
+        function toggleIdeaReports() {
+            document.getElementById("category-sections").style.display = "none";
+            document.getElementById("idea-report-section").style.display = "block";
+        }
+
+        function confirmLogout() {
+            if (confirm('Do You Want To Log Out?')) {
+                window.location.href = 'logout.php';
+            }
+        }
+    </script>
 </body>
 </html>
