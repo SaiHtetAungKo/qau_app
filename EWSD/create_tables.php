@@ -28,6 +28,7 @@ $connection = $connect->getConnection(); // Use getConnection() method
 // $create = "CREATE TABLE departments (
 //     department_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 //     department_name VARCHAR(255),
+//     department_location TEXT,
 //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 //     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 // )";
