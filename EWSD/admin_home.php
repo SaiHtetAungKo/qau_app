@@ -53,8 +53,9 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
             <a class="nav-link" href="staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
             <a class="nav-link" href="request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
             <a class="nav-link" href="idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
-            <a class="nav-link" href="register.php"><b>User Registration</b></a>
-            <a class="nav-link" href="change_password.php"><b>Change Password</b></a>
+            <a class="nav-link" href="register.php">User Registration</a>
+            <a class="nav-link" href="change_password.php">Change Password</a>
+            <a class="nav-link" href="department.php">Department</a>
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
         <div class="dash-section">
@@ -144,6 +145,8 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
         </div>
 
     </div>
+
+
 </body>
 
 </html>
