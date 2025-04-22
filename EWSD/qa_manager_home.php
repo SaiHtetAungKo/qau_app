@@ -45,17 +45,38 @@ while ($row = mysqli_fetch_assoc($unusedResult)) {
     $unusedCategories[] = $row;
 }
 
-// Mock department data
-$departments = [
-    ['name' => 'Department A', 'ideas' => 100, 'percentage' => '80%', 'contributors' => 18],
-    ['name' => 'Department B', 'ideas' => 120, 'percentage' => '75%', 'contributors' => 21],
-    ['name' => 'Department C', 'ideas' => 90, 'percentage' => '85%', 'contributors' => 14],
-    ['name' => 'Department D', 'ideas' => 110, 'percentage' => '78%', 'contributors' => 20],
-    ['name' => 'Department E', 'ideas' => 95, 'percentage' => '88%', 'contributors' => 17],
-    ['name' => 'Department F', 'ideas' => 80, 'percentage' => '65%', 'contributors' => 10],
-    ['name' => 'Department G', 'ideas' => 80, 'percentage' => '65%', 'contributors' => 10],
-    ['name' => 'Department H', 'ideas' => 80, 'percentage' => '65%', 'contributors' => 10]
-];
+// New SQL query to fetch department idea data with contribution percentage
+$query = "
+WITH department_idea_data AS (
+  SELECT 
+    d.department_id AS department_id,
+    d.department_name AS department_name,
+    COUNT(i.idea_id) AS total_ideas,
+    COUNT(DISTINCT u.user_id) AS total_posters
+  FROM departments d
+  LEFT JOIN users u ON u.department_id = d.department_id
+  LEFT JOIN ideas i ON i.userID = u.user_id
+  GROUP BY d.department_id, d.department_name
+),
+total_idea_count AS (
+  SELECT COUNT(*) AS total_ideas FROM ideas
+)
+SELECT 
+  did.department_id,
+  did.department_name,
+  did.total_ideas,
+  did.total_posters,
+  ROUND(CAST(did.total_ideas AS FLOAT) / tic.total_ideas * 100, 2) AS contribution_percentage
+FROM department_idea_data did
+CROSS JOIN total_idea_count tic
+ORDER BY did.total_ideas DESC;
+";
+
+$result = mysqli_query($connection, $query);
+$departments = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $departments[] = $row;
+}
 ?>
 
 <!DOCTYPE html>
@@ -157,11 +178,11 @@ $departments = [
                     <?php foreach ($departments as $dept) { ?>
                         <div class="category-card">
                             <div class="green-box"></div>
-                            <h4><?php echo htmlspecialchars($dept['name']); ?></h4>
+                            <h4><?php echo htmlspecialchars($dept['department_name']); ?></h4>
                             <p>
-                                Total Number of ideas: <?php echo $dept['ideas']; ?><br>
-                                Percentage of ideas: <?php echo $dept['percentage']; ?><br>
-                                Number of contributors: <?php echo $dept['contributors']; ?>
+                                Total Number of ideas: <?php echo $dept['total_ideas']; ?><br>
+                                Number of posters: <?php echo $dept['total_posters']; ?><br>
+                                Contribution Percentage: <?php echo $dept['contribution_percentage']; ?>%
                             </p>
                             <span class="arrow">&rarr;</span>
                         </div>
@@ -169,9 +190,15 @@ $departments = [
                 </div>
 
                 <div class="download-section">
-                    <p>You can download only after final closure date</p>
-                    <button class="download-btn">&#8681; Download</button>
-                </div>
+                <p>You can download only after final closure date</p> 
+                  
+
+    <form method="POST" action="download_csv.php">
+        <button type="submit" name="download_csv" class="download-btn">&#8681; Download</button>
+    </form>
+</div>
+
+
             </div>
         </main>
     </div>
