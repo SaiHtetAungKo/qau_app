@@ -190,9 +190,15 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
 
                 <div class="download-section">
-                    <p>You can download only after final closure date</p>
-                    <button class="download-btn">&#8681; Download</button>
-                </div>
+                <p>You can download only after final closure date</p> 
+                  
+
+    <form method="POST" action="download_csv.php">
+        <button type="submit" name="download_csv" class="download-btn">&#8681; Download</button>
+    </form>
+</div>
+
+
             </div>
         </main>
     </div>
