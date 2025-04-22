@@ -1,3 +1,4 @@
+
 /* Font Format */
 *{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -402,3 +403,82 @@
     height: 200px;
     margin: 0px auto;
   }
+
+  /* For Department Page */
+  .admin-container .dash-section .dep-container{
+    background-color: #fff;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+  }
+  .admin-container .dash-section .dep-container .dep-form{
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .admin-container .dash-section .dep-container .input-box{
+    width: 300px;
+  }
+  .admin-container .dash-section .dep-container input{
+    padding: 10px 12px;
+    border: 1px solid #212121;
+    border-radius: 5px;
+    margin: 10px 0px;
+    width: 100%;
+  }
+  .admin-container .dash-section .dep-container button{
+    height: 40px;
+    border-radius: 10px;
+    padding: 10px 20px;
+  }
+  .admin-container .dash-section .dep-list-container{
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-y: auto;
+    height: 250px;
+  }
+  .department-table {
+    width: 100%;
+
+    
+}
+
+.department-table th,
+.department-table td {
+    padding:10px;
+    text-align: left;
+}
+.department-table thead{
+  position: sticky;
+  top: 0;
+  
+}
+.department-table th {
+    background-color: #f4f4f4;
+    text-align: center;
+}
+.department-table .status{
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+.department-table .status button{
+  width: 80px;
+  height: 30px;
+  margin: 0px auto;
+}
+.department-table .action{
+  text-align: center;
+}
+.department-table .action i{
+  padding: 0px 10px;
+  font-size: 1.1rem;
+}
+.department-table .action .delete-btn{
+  color: red;
+}
+.department-table .action .edit-btn{
+  color: #2F6CD0;
+}

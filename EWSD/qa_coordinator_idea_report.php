@@ -38,12 +38,12 @@ $result = $connection->query($query);
             <div class="logo text-center">
                 <h2>LOGO</h2>
             </div>
-            <a class="nav-link" href="admin_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a class="nav-link" href="staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
-            <a class="nav-link" href="request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
-            <a class="nav-link-active" href="idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
-            <a class="nav-link" href="register.php"><b>User Registration</b></a>
-            <a class="nav-link" href="change_password.php"><b>Change Password</b></a>
+            <a class="nav-link" href="qa_coordinator_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a class="nav-link" href="qa_coordinator_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
+            <a class="nav-link" href="qa_coordinator_request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
+            <a class="nav-link-active" href="qa_coordinator_idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <!-- <a class="nav-link" href="register.php"><b>User Registration</b></a>
+            <a class="nav-link" href="change_password.php"><b>Change Password</b></a> -->
             <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
         <div class="dash-section">
