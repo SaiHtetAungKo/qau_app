@@ -1,16 +1,55 @@
 <?php
 session_start();
 include('connection.php');
-$connect = new Connect(); 
-$connection = $connect->getConnection(); 
+$connect = new Connect();
+$connection = $connect->getConnection();
 
-if (!isset($_SESSION['user'])) {
-    echo "<script> alert('Please Login First'); window.location = 'index.php'; </script>";
-    exit;
+// if (!isset($_SESSION['user'])) {
+//     echo "<script> alert('Please Login First'); window.location = 'index.php'; </script>";
+//     exit;
+// }
+if (isset($_POST['btnsubmit'])) {
+  $MainCategoryTitle = $_POST['mainCategory'];
+  $Description = $_POST['Description'];
+  $Status = $_POST['Status'];
+  $subCategory = $_POST['subCategory'];
+  $subdescription = $_POST['Sub-Description'];
+
+
+
+  $query = "SELECT * FROM MainCategory
+			WHERE MainCategoryTitle='$MainCategoryTitle'";
+  $ret = mysqli_query($connection, $query);
+  $count = mysqli_num_rows($ret);
+
+  if ($count > 0) {
+    echo "<script>window.alert('Main Category Title already exist !');</script>";
+    echo "<script>window.location='add_category.php'</script>";
+  }   else {
+    $Insert = "INSERT INTO MainCategory (MainCategoryTitle, Description, Status, created_at, updated_at)
+      VALUES ('$MainCategoryTitle', '$Description', '$Status', NOW(), NOW())";
+    $ret = mysqli_query($connection, $Insert);
+
+    if ($ret) {
+      $last_id = mysqli_insert_id($connection);
+
+      $Insert1 = "INSERT INTO SubCategory (MainCategoryID, SubCategoryTitle, Description, created_at, updated_at)
+        VALUES ('$last_id', '$subCategory[0]', '$subdescription', NOW(), NOW())";
+
+      mysqli_query($connection, $Insert1);
+
+      echo "<script>window.alert('Main Category and Sub Category added successfully!');</script>";
+      echo "<script>window.location='add_category.php'</script>";
+    } else {
+      echo "<script>window.alert('Failed to insert main category.');</script>";
+    }
+  }
+
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>New Category</title>
@@ -24,10 +63,10 @@ if (!isset($_SESSION['user'])) {
     }
 
     .container {
-  max-width: 600px;
-  margin-left: 60px;
-  padding: 50px 20px;
-}
+      max-width: 600px;
+      margin-left: 60px;
+      padding: 50px 20px;
+    }
 
 
     h1 {
@@ -104,24 +143,24 @@ if (!isset($_SESSION['user'])) {
     }
 
     .back-button {
-  display: inline-block;
-  margin: 30px 0 0 60px;
-  font-size: 16px;
-  color: white;
-  background-color: #5f4b8b;
-  padding: 10px 18px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
-}
+      display: inline-block;
+      margin: 30px 0 0 60px;
+      font-size: 16px;
+      color: white;
+      background-color: #5f4b8b;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
 
-.back-button:hover {
-  background-color: #4a3a6b;
-}
-
+    .back-button:hover {
+      background-color: #4a3a6b;
+    }
   </style>
 </head>
+
 <body>
   <div class="top-right">
     <div class="name">Name</div>
@@ -131,16 +170,26 @@ if (!isset($_SESSION['user'])) {
 
   <div class="container">
     <h1>New Category</h1>
-    <form action="save_category.php" method="POST">
+    <form action="add_category.php" method="POST">
       <label for="mainCategory">Main Category</label>
       <input type="text" id="mainCategory" name="mainCategory" placeholder="Enter your main category" required>
+
+      <label for="Description">Description</label>
+      <input type="text" id="Description" name="Description" placeholder="Enter your Description" required>
+
+      <label for="status">Status</label>
+      <input type="text" id="Status" name="Status" placeholder="Enter your Status" required>
 
       <label for="subCategory">Sub Category</label>
       <input type="text" id="subCategory" name="subCategory[]" placeholder="Enter your sub category" required>
 
+      <label for="Sub-Description">Sub-Description</label>
+      <input type="text" id="Sub-Description" name="Sub-Description" placeholder="Enter your sub category" required>
+
+
       <button type="button" class="add-sub-btn" onclick="addSubCategory()">Add Another Sub Category</button>
 
-      <button type="submit" class="create-btn">Create</button>
+      <button type="submit" name="btnsubmit" class="create-btn">Create</button>
     </form>
   </div>
 
@@ -165,4 +214,5 @@ if (!isset($_SESSION['user'])) {
     }
   </script>
 </body>
+
 </html>
