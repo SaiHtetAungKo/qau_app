@@ -48,7 +48,7 @@ if ($data) {
         } elseif ($roleID == '3') {
             header("location: qa_coordinator_home.php");
         } elseif ($roleID == '4') {
-            header("location: staff_home.php");
+            header("location: staff_home_2.php");
         }
     } else {
         // Incorrect password

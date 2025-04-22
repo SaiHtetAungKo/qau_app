@@ -1,0 +1,13 @@
+<?php
+$conn = new mysqli('localhost', 'username', 'password', 'your_db');
+
+$mainId = isset($_GET['main_id']) ? (int)$_GET['main_id'] : 0;
+$result = $conn->query("SELECT id, name FROM sub_categories WHERE main_category_id = $mainId");
+$subcategories = [];
+
+while ($row = $result->fetch_assoc()) {
+    $subcategories[] = $row;
+}
+
+echo json_encode($subcategories);
+?>

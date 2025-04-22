@@ -1,0 +1,13 @@
+<?php
+// Connect to DB
+$conn = new mysqli('localhost', 'root', 'password', 'quality_assurance');
+
+$result = $conn->query(`SELECT MainCategoryID, MainCategoryTitle, Description FROM maincategory`);
+$categories = [];
+
+while ($row = $result->fetch_assoc()) {
+    $categories[] = $row;
+}
+
+echo json_encode($categories);
+?>

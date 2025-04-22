@@ -1,0 +1,59 @@
+.ideas-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.idea-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.idea-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: gray;
+    border-radius: 50%;
+}
+
+.idea-info {
+    flex: 1;
+    margin-left: 10px;
+}
+
+.idea-categories span {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    color: white;
+}
+
+.main-category {
+    background: #6a4c93;
+}
+
+.sub-category {
+    background: #8bd3c7;
+}
+
+.idea-content {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.idea-actions button {
+    background: #eee;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+}
