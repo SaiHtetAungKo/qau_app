@@ -86,7 +86,8 @@ while ($row = mysqli_fetch_assoc($result)) {
     <title>QA Manager Category and Idea Report</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
@@ -117,13 +118,16 @@ while ($row = mysqli_fetch_assoc($result)) {
     </style>
 </head>
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <h2>Logo</h2>
-            <button class="btn" onclick="toggleCategories()">Categories</button>
-            <button class="btn" onclick="toggleIdeaReports()">Idea Reports</button>
-            <button class="logout" onclick="confirmLogout()">Log Out</button>
-        </aside>
+
+<div class="admin-container">
+<div class="side-nav">
+            <div class="logo text-center">
+                <h2>LOGO</h2>
+            </div>
+            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-house"></i> Categories</a>
+            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-solid fa-users"></i> Idea Reports</a>
+            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+        </div>
 
         <main class="content">
             <header>
@@ -171,7 +175,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
             </div>
 
-            <!-- Idea Report Section -->
+            <!-- Idea Report Section
             <div id="idea-report-section">
                 <h2>Idea Reports by Each Department</h2>
                 <div class="categories">
@@ -196,7 +200,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <form method="POST" action="download_csv.php">
         <button type="submit" name="download_csv" class="download-btn">&#8681; Download</button>
     </form>
-</div>
+</div> -->
 
 
             </div>
@@ -220,5 +224,10 @@ while ($row = mysqli_fetch_assoc($result)) {
             }
         }
     </script>
+</div>
+
+   
+
+       
 </body>
 </html>

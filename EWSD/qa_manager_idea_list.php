@@ -66,15 +66,11 @@ while ($row = mysqli_fetch_assoc($topResult)) {
 <head>
     <meta charset="UTF-8">
     <title>Idea by Department</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #4B3574;
-            color: white;
-            margin: 0;
-            padding: 0;
-        }
+         body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
 
         .container {
             max-width: 900px;
@@ -96,7 +92,8 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             margin-bottom: 20px;
             text-decoration: none;
         }
-
+        .logout { margin-top: auto; background: #3c9a72; padding: 12px; color: white; border: none; width: 100%; border-radius: 10px; cursor: pointer; font-size: 16px; }
+        .logout:hover { background: rgb(89, 64, 122); }
         h2 {
             font-size: 24px;
             margin-bottom: 20px;
@@ -147,6 +144,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             font-size: 14px;
             margin: 0;
         }
+        .content { flex: 1; background: rgb(89, 64, 122); color: white; padding: 20px; overflow-y: auto; }
 
         .subcategory {
             background-color: #A3E7D8;
@@ -161,7 +159,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             font-size: 14px;
             line-height: 1.6;
         }
-
+        .green-box { width: 40px; height: 40px; background-color: #90d5c9; border-radius: 12px; margin-bottom: 10px; }
         .reactions {
             display: flex;
             gap: 15px;
@@ -207,10 +205,18 @@ while ($row = mysqli_fetch_assoc($topResult)) {
 </head>
 <body>
 
-<div class="container">
+<div class="admin-container">
+    <div class="side-nav">
+            <div class="logo text-center">
+                <h2>LOGO</h2>
+            </div>
+            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-house"></i> Categories</a>
+            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-solid fa-users"></i> Idea Reports</a>
+            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+    </div>
+    <main class="content">
     <a href="qa_manager_home.php" class="back-btn">← Back</a>
     <h2>Idea by <span>Department</span></h2>
-
     <?php foreach ($ideas as $idea): ?>
     <div class="card">
         <div class="user-info">
@@ -233,14 +239,6 @@ while ($row = mysqli_fetch_assoc($topResult)) {
         </div>
     </div>
 <?php endforeach; ?>
-
-
-    <div class="footer-section">
-        <p class="note">You can download only after final closure date</p>
-        <button class="download-btn">⬇️ Download</button>
-    </div>
-</div>
-
 <!-- MODAL -->
 <!-- MODAL -->
 <div id="commentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; font-family:'Poppins', sans-serif;">
@@ -260,8 +258,13 @@ while ($row = mysqli_fetch_assoc($topResult)) {
         </div>
     </div>
 </div>
-
-
+<div class="footer-section">
+        <p class="note">You can download only after final closure date</p>
+        <button class="download-btn">⬇️ Download</button>
+    </div>
+    </main>
+    
+</div>
 
 
 <!-- JS for modal -->

@@ -53,14 +53,11 @@ if (isset($_POST['btnsubmit'])) {
 <head>
   <meta charset="UTF-8">
   <title>New Category</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: #563d7c;
-      color: white;
-    }
+    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
 
     .container {
       max-width: 600px;
@@ -90,6 +87,22 @@ if (isset($_POST['btnsubmit'])) {
       border-radius: 10px;
       box-sizing: border-box;
     }
+    .logout { margin-top: auto; background: #3c9a72; padding: 12px; color: white; border: none; width: 100%; border-radius: 10px; cursor: pointer; font-size: 16px; }
+    .logout:hover { background: rgb(89, 64, 122); }
+    .back-btn {
+            background-color: #A3E7D8;
+            color: black;
+            font-weight: 600;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
 
     .add-sub-btn {
       display: flex;
@@ -105,7 +118,9 @@ if (isset($_POST['btnsubmit'])) {
       border-radius: 10px;
       cursor: pointer;
     }
-
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+        input[type="text"] { padding: 12px; width: 50%; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; }
+        .user-info { text-align: right; margin-right: 21px; }
     .add-sub-btn::before {
       content: "+";
       font-size: 1.5rem;
@@ -154,7 +169,7 @@ if (isset($_POST['btnsubmit'])) {
       font-weight: 500;
       transition: background-color 0.3s ease;
     }
-
+    .content { flex: 1; background: rgb(89, 64, 122); color: white; padding: 20px; overflow-y: auto; }
     .back-button:hover {
       background-color: #4a3a6b;
     }
@@ -162,14 +177,28 @@ if (isset($_POST['btnsubmit'])) {
 </head>
 
 <body>
-  <div class="top-right">
-    <div class="name">Name</div>
-    <div class="role">QA Manager</div>
-  </div>
-  <a href="qa_manager_home.php" class="back-button">← Back</a>
 
-  <div class="container">
-    <h1>New Category</h1>
+<div class="admin-container">
+<div class="side-nav">
+            <div class="logo text-center">
+                <h2>LOGO</h2>
+            </div>
+            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-house"></i> Categories</a>
+            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-solid fa-users"></i> Idea Reports</a>
+            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+        </div>
+        
+        <main class="content">
+        <!-- <header>
+               
+                <div class="user-info">
+                    <span><strong>Name</strong></span><br>
+                    <span>QA Manager</span>
+                </div>
+                
+            </header> -->
+            <a href="qa_manager_home.php" class="back-btn">← Back</a>
+          <h1>New Category Registration</h1>
     <form action="add_category.php" method="POST">
       <label for="mainCategory">Main Category</label>
       <input type="text" id="mainCategory" name="mainCategory" placeholder="Enter your main category" required>
@@ -191,7 +220,10 @@ if (isset($_POST['btnsubmit'])) {
 
       <button type="submit" name="btnsubmit" class="create-btn">Create</button>
     </form>
-  </div>
+        </main>
+        
+        </div>
+  
 
   <script>
     function addSubCategory() {
