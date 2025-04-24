@@ -26,6 +26,7 @@ $topQuery = "SELECT
         i.anonymousSubmission,
         i.created_at AS idea_created_at,
         i.updated_at AS idea_updated_at,
+        dp.department_name AS department_name,
         COUNT(DISTINCT ic.ideacommentID) AS comment_count,
         COUNT(DISTINCT iv.ideavoteID) AS total_votes,
         SUM(CASE WHEN iv.votetype = 1 THEN 1 ELSE 0 END) AS upvotes,
@@ -42,6 +43,10 @@ $topQuery = "SELECT
         idea_comment ic ON i.idea_id = ic.idea_id
     LEFT JOIN 
         idea_vote iv ON i.idea_id = iv.idea_id
+    LEFT JOIN 
+        users u ON u.user_id = i.userID
+    LEFT JOIN 
+        departments dp ON dp.department_id = u.department_id
     WHERE 
         mc.MainCategoryTitle = '$categoryName'
     GROUP BY 
@@ -223,7 +228,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             <div class="user-left">
                 <div class="avatar">👤</div>
                 <div>
-                    <p class="dept-name"><?= htmlspecialchars($idea['MainCategoryTitle']) ?></p>
+                    <p class="dept-name"><?= htmlspecialchars($idea['department_name']) ?></p>
                     <p class="date"><?= date("d.m.Y", strtotime($idea['idea_created_at'])) ?></p>
                 </div>
             </div>
