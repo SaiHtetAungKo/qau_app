@@ -189,7 +189,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                                 Number of posters: <?php echo $dept['total_posters']; ?><br>
                                 Contribution Percentage: <?php echo $dept['contribution_percentage']; ?>%
                             </p>
+                            <a href="qa_manager_idea_list_department.php?category_name=<?php echo urlencode($dept['department_name']); ?>">
                             <span class="arrow">&rarr;</span>
+                            </a>
                         </div>
                     <?php } ?>
                 </div>

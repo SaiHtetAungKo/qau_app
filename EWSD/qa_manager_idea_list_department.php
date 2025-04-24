@@ -48,7 +48,7 @@ $topQuery = "SELECT
     LEFT JOIN 
         departments dp ON dp.department_id = u.department_id
     WHERE 
-        mc.MainCategoryTitle = '$categoryName'
+        dp.department_name = '$categoryName'
     GROUP BY 
         mc.MainCategoryTitle,
         sc.SubCategoryTitle,
@@ -220,8 +220,8 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
     </div>
     <main class="content">
-    <a href="qa_manager_home.php" class="back-btn">← Back</a>
-    <h2>Idea by <span>Category</span></h2>
+    <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a>
+    <h2>Idea by <span>Department</span></h2>
     <?php foreach ($ideas as $idea): ?>
     <div class="card">
         <div class="user-info">
