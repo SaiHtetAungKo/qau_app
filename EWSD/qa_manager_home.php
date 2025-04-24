@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
 $topQuery = "SELECT 
                 mc.MainCategoryID,
                 mc.MainCategoryTitle,
+                sc.SubCategoryTitle,
                 COUNT(i.idea_id) AS idea_count
              FROM ideas i
              JOIN subcategory sc ON i.SubCategoryID = sc.SubCategoryID
@@ -32,6 +33,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
 // 2. Unused Categories (No ideas at all)
 $unusedQuery = "SELECT 
                    mc.MainCategoryID,
+                    sc.SubCategoryTitle,
                    mc.MainCategoryTitle
                 FROM maincategory mc
                 LEFT JOIN subcategory sc ON mc.MainCategoryID = sc.MainCategoryID
@@ -147,13 +149,17 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <div class="category-card">
                             <img src="images/dummy_category.png" alt="" class="category-image">
                             <h4>
-                            <a href="qa_manager_idea_list.php?category_name=<?php echo urlencode($cat['MainCategoryTitle']); ?>">
+                           
     <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
-</a>
 
     </h4>
+    <h4>               
+    <?php echo htmlspecialchars($cat['SubCategoryTitle']); ?>
+    </h4>
                             <p>Total Ideas: <?php echo $cat['idea_count']; ?></p>
+                            <a href="qa_manager_idea_list.php?category_name=<?php echo urlencode($cat['MainCategoryTitle']); ?>">
                             <span class="arrow">&rarr;</span>
+                            </a>
                         </div>
                     <?php } ?>
                 </div>
@@ -168,8 +174,12 @@ while ($row = mysqli_fetch_assoc($result)) {
             <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
         </a>
     </h4>
-                            <p>No ideas submitted</p>
-                            <span class="delete">&#128465;</span>
+    <h4>               
+    <?php echo htmlspecialchars($cat['SubCategoryTitle']); ?>
+    </h4>
+                            <!-- <p>No ideas submitted</p> -->
+                            <span class="delete" data-category-id="<?php echo $cat['MainCategoryID']; ?>">&#128465;</span>
+
                         </div>
                     <?php } ?>
                 </div>
@@ -208,6 +218,36 @@ while ($row = mysqli_fetch_assoc($result)) {
     </div>
 
     <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+    const deletes = document.querySelectorAll(".delete");
+
+    deletes.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const categoryId = this.getAttribute("data-category-id");
+
+            if (confirm("Are you sure you want to delete this category?")) {
+                fetch('delete_category.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `category_id=${categoryId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload just the unused categories section
+                        location.reload(); // Or use AJAX to reload the section
+                    } else {
+                        alert("Error deleting category: " + data.error);
+                    }
+                });
+            }
+        });
+    });
+});
+
         function toggleCategories() {
             document.getElementById("category-sections").style.display = "block";
             document.getElementById("idea-report-section").style.display = "none";
@@ -225,9 +265,5 @@ while ($row = mysqli_fetch_assoc($result)) {
         }
     </script>
 </div>
-
-   
-
-       
 </body>
 </html>
