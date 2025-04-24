@@ -178,7 +178,8 @@ while ($row = mysqli_fetch_assoc($result)) {
     <?php echo htmlspecialchars($cat['SubCategoryTitle']); ?>
     </h4>
                             <!-- <p>No ideas submitted</p> -->
-                            <span class="delete">&#128465;</span>
+                            <span class="delete" data-category-id="<?php echo $cat['MainCategoryID']; ?>">&#128465;</span>
+
                         </div>
                     <?php } ?>
                 </div>
@@ -217,6 +218,36 @@ while ($row = mysqli_fetch_assoc($result)) {
     </div>
 
     <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+    const deletes = document.querySelectorAll(".delete");
+
+    deletes.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const categoryId = this.getAttribute("data-category-id");
+
+            if (confirm("Are you sure you want to delete this category?")) {
+                fetch('delete_category.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `category_id=${categoryId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload just the unused categories section
+                        location.reload(); // Or use AJAX to reload the section
+                    } else {
+                        alert("Error deleting category: " + data.error);
+                    }
+                });
+            }
+        });
+    });
+});
+
         function toggleCategories() {
             document.getElementById("category-sections").style.display = "block";
             document.getElementById("idea-report-section").style.display = "none";
@@ -234,9 +265,5 @@ while ($row = mysqli_fetch_assoc($result)) {
         }
     </script>
 </div>
-
-   
-
-       
 </body>
 </html>
