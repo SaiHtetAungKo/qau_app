@@ -4,7 +4,6 @@ include('connection.php');
 $connect = new Connect();
 $connection = $connect->getConnection();
 
-// Check whether user is logged in
 if (!isset($_SESSION['userID'])) {
     echo "<script>
         alert('Please Login First');
@@ -16,9 +15,25 @@ if (!isset($_SESSION['userID'])) {
 $userName = $_SESSION['userName'];
 $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg';
 
-// Fetch all request ideas
-$query = "SELECT requestIdea_id, title, description, closure_date, final_closure_date FROM request_ideas ORDER BY closure_date DESC";
-$result = $connection->query($query);
+// Fetch user's department ID
+$userID = $_SESSION['userID'];
+$userQuery = "SELECT department_id FROM users WHERE user_id = ?";
+$stmt = $connection->prepare($userQuery);
+$stmt->bind_param('i', $userID);
+$stmt->execute();
+$userResult = $stmt->get_result();
+$userData = $userResult->fetch_assoc();
+$userDepartmentId = $userData['department_id'];
+
+// Fetch request ideas for user's department
+$query = "SELECT requestIdea_id, title, description, closure_date, final_closure_date 
+          FROM request_ideas 
+          WHERE department_id = ?
+          ORDER BY closure_date DESC";
+$stmt = $connection->prepare($query);
+$stmt->bind_param('i', $userDepartmentId);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +57,7 @@ $result = $connection->query($query);
             <a class="nav-link" href="qa_coordinator_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
             <a class="nav-link" href="qa_coordinator_request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
             <a class="nav-link-active" href="qa_coordinator_idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_coordinator_annoucement.php"><i class="fa-regular fa-lightbulb"></i> Annoucement</a> 
             <!-- <a class="nav-link" href="register.php"><b>User Registration</b></a>
             <a class="nav-link" href="change_password.php"><b>Change Password</b></a> -->
             <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
