@@ -12,6 +12,24 @@ if (!isset($_SESSION['userID'])) {
 
 $user_id = $_SESSION['userID'];
 $userName = $_SESSION['userName'];
+$userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg';
+$isDisabled = false;
+
+if ($user_id) {
+    $query = "SELECT account_status FROM users WHERE user_id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user && $user['account_status'] !== 'active') {
+        $isDisabled = true;
+    }
+} else {
+    // User not logged in
+    $isDisabled = true;
+}
 ?>
 
 <!DOCTYPE html>
@@ -87,7 +105,7 @@ $userName = $_SESSION['userName'];
             min-height: 150px;
         }
 
-        .avatar {
+        .avatar img{
             width: 60px;
             height: 60px;
             background-color: #3b3b3b;
@@ -99,7 +117,12 @@ $userName = $_SESSION['userName'];
             font-weight: bold;
             margin-right: 10px;
         }
-
+        .custom-box.disabled-box {
+            background-color: #e0d6ec; /* Pale soft purple (disabled look) */
+            opacity: 0.6;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
         .input-box {
             flex-grow: 1;
             background-color: white;
@@ -213,6 +236,15 @@ $userName = $_SESSION['userName'];
         .idea-upload-box{
             cursor: pointer;
         }
+        .staff-btn-purple {
+            background-color: #6A4C93;
+            color: white;
+        }
+
+        .staff-btn-purple:hover {
+            background-color: rgb(120, 91, 160);
+            color: white;
+        }
     </style>
 
 
@@ -232,19 +264,31 @@ $userName = $_SESSION['userName'];
                     <p><strong><?php echo htmlspecialchars($userName); ?></strong><br>Department</p>
                 </div>
             </div>
+ 
+                <div class="col-md-9 p-4">
+                    <!-- check the user account status whether allow to post idea -->
+                    <div class="custom-box <?php if ($isDisabled) echo 'disabled-box'; ?>">
+                        <div class="avatar">
+                            <img src="<?php echo htmlspecialchars($userProfileImg); ?>"
+                                alt="Profile Image">
+                        </div>
+                        <div 
+                            class="input-box py-2 idea-upload-box" 
+                            <?php if (!$isDisabled): ?>
+                                onclick="window.location.href='upload_idea_page.php'"
+                            <?php endif; ?>
+                        >
+                            <?php echo $isDisabled ? 'Sorry, your account has been disabled. You cannot post ideas.' : 'Which idea would you like to submit'; ?>
+                        </div>
+                        <div class="icon">🔔</div>
+                    </div>
 
-            <div class="col-md-9 p-4">
 
-                <div class="custom-box">
-                    <div class="avatar">👤</div>
-                    <div class="input-box py-2 idea-upload-box" onclick="window.location.href='upload_idea_page.php'">Which idea would you like to submit</div>
-                    <div class="icon">🔔</div>
+                    <div class="mt-4 idea-box" id="idea-container">
+
+                    </div>
                 </div>
-
-                <div class="mt-4 idea-box" id="idea-container">
-
-                </div>
-            </div>
+  
         </div>
     </div>
     <!-- COMMENT MODAL -->
@@ -289,11 +333,31 @@ $userName = $_SESSION['userName'];
         </div>
     </div>
 
+    <!-- show if user is disabled to comment idea -->
+    <div class="modal fade" id="disabledActionModal" tabindex="-1" aria-labelledby="disabledActionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="disabledActionLabel">Action not allowed</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Your account is disabled. You can't comment on ideas.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn staff-btn-purple" data-bs-dismiss="modal">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         const buttons = document.querySelectorAll('.side-btn');
+        const isUserDisabled = <?php echo json_encode($isDisabled); ?>;
 
         buttons.forEach(button => {
             button.addEventListener('click', () => {
@@ -348,7 +412,7 @@ $userName = $_SESSION['userName'];
                 <div class="mt-3 d-flex interaction-buttons">
                     <button class="btn btn-outline-dark me-2" id="like-${idea.idea_id}" onclick="handleVote(${idea.idea_id},1)">${idea.most_like} 👍</button>
                     <button class="btn btn-outline-dark me-2" id="unlike-${idea.idea_id}" onclick="handleVote(${idea.idea_id},2)">${idea.unlike} 👎</button>
-                    <button class="btn btn-outline-dark me-2" id="comment-${idea.idea_id}" onclick="showCommentModel(${idea.idea_id})"> 💬</button>
+                    <button class="btn btn-outline-dark me-2" id="comment-${idea.idea_id}" onclick="handleCommentClick(${idea.idea_id})"> 💬</button>
                 </div>
             `;
 
@@ -390,6 +454,15 @@ $userName = $_SESSION['userName'];
                     }
                 }
             });
+        }
+
+        function handleCommentClick(ideaId) {
+            if (isUserDisabled) {
+                const disabledModal = new bootstrap.Modal(document.getElementById('disabledActionModal'));
+                disabledModal.show();
+            } else {
+                showCommentModel(ideaId);
+            }
         }
 
         function showCommentModel(ideaId) {

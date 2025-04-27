@@ -10,6 +10,15 @@ if (!isset($_SESSION['user'])) {
     echo "<script> window.location= 'index.php'; </script>";
     exit(); // Stop further code execution
 }
+
+if (isset($_GET['msg']) && $_GET['msg'] == 'status_changed') {
+    if (isset($_GET['status']) && $_GET['status'] == 'hide') {
+        echo "<div class='popup-message'>Idea has been successfully hidden</div>";
+    } elseif (isset($_GET['status']) && $_GET['status'] == 'active') {
+        echo "<div class='popup-message'>Idea has been successfully unhidden</div>";
+    }
+}
+
 // $categoryId = $_GET['category_name'];
 $categoryName = mysqli_real_escape_string($connection, $_GET['category_name']);
 
@@ -99,6 +108,18 @@ while ($row = mysqli_fetch_assoc($topResult)) {
         }
         .logout { margin-top: auto; background: #3c9a72; padding: 12px; color: white; border: none; width: 100%; border-radius: 10px; cursor: pointer; font-size: 16px; }
         .logout:hover { background: rgb(89, 64, 122); }
+
+        
+        /* for successful disable staff acc msg */
+   
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
         h2 {
             font-size: 24px;
             margin-bottom: 20px;
@@ -168,6 +189,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
         .reactions {
             display: flex;
             gap: 15px;
+            justify-content: flex-start;
         }
 
         .reactions button {
@@ -180,6 +202,29 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             align-items: center;
             gap: 8px;
             cursor: pointer;
+        }
+        .reactions a {
+            padding: 10px 20px;
+            border: 2px solid #ccc;
+            text-decoration: none;
+            border-radius: 20px;
+            background: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .reactions .hide-idea-btn {
+            margin-left: auto;  
+            background-color: #59417B; 
+            border-color: #59417B;  
+            color: white;
+        }
+
+        .reactions .hide-idea-btn:hover {
+            background-color:rgb(124, 91, 170);
+            border-color: rgb(124, 91, 170);
         }
 
         .footer-section {
@@ -215,8 +260,12 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             <div class="logo text-center">
                 <h2>LOGO</h2>
             </div>
-            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-house"></i> Categories</a>
-            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-solid fa-users"></i> Idea Reports</a>
+            <a class="nav-link
+            " href="qa_manager_dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a class="nav-link" href="qa_manager_home.php"><i class="fa-solid fa-layer-group"></i> Categories</a>
+            <a class="nav-link-active" href="qa_manager_idea_summary.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_manager_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
+            <a class="nav-link" href="qa_manager_hidden_idea_list.php"><i class="fa-regular fa-eye-slash"></i> Hidden Idea List</a>
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
     </div>
     <main class="content">
@@ -236,12 +285,27 @@ while ($row = mysqli_fetch_assoc($topResult)) {
         </div>
 
         <p class="idea-text"><?= htmlspecialchars($idea['idea_description']) ?></p>
-
+        
+  
         <div class="reactions">
             <button><?= $idea['upvotes'] ?> 👍</button>
             <button><?= $idea['downvotes'] ?> 👎</button>
             <button onclick="openModal(<?= $idea['idea_id'] ?>)"><?= $idea['comment_count'] ?> 💬</button>
+
+            <?php
+            
+                $idea_status = $idea['idea_status']; // 'active' or 'hide'
+
+                if ($idea_status == 'hide') {
+                    // Show Unhide button
+                    echo '<a href="hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Unhide</a>';
+                } else {
+                    // Show Hide button
+                    echo '<a href="hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Hide</a>';
+                }
+            ?>
         </div>
+
     </div>
 <?php endforeach; ?>
 <!-- MODAL -->
@@ -275,59 +339,59 @@ while ($row = mysqli_fetch_assoc($topResult)) {
 <!-- JS for modal -->
 <script>
 
-const ideaData = <?= json_encode($ideas) ?>;
+    const ideaData = <?= json_encode($ideas) ?>;
 
-function openModal(ideaId) {
-    const idea = ideaData.find(i => i.idea_id == ideaId);
-    const comments = idea.comment_texts?.split('||') || [];
-    const dates = idea.comment_dates?.split('||') || [];
+    function openModal(ideaId) {
+        const idea = ideaData.find(i => i.idea_id == ideaId);
+        const comments = idea.comment_texts?.split('||') || [];
+        const dates = idea.comment_dates?.split('||') || [];
 
-    // Filter out duplicates based on comment + date combo
-    const seen = new Set();
-    const uniqueComments = [];
-    const uniqueDates = [];
+        // Filter out duplicates based on comment + date combo
+        const seen = new Set();
+        const uniqueComments = [];
+        const uniqueDates = [];
 
-    comments.forEach((comment, index) => {
-        const key = comment.trim() + dates[index]?.trim();
-        if (!seen.has(key)) {
-            seen.add(key);
-            uniqueComments.push(comment);
-            uniqueDates.push(dates[index]);
-        }
-    });
+        comments.forEach((comment, index) => {
+            const key = comment.trim() + dates[index]?.trim();
+            if (!seen.has(key)) {
+                seen.add(key);
+                uniqueComments.push(comment);
+                uniqueDates.push(dates[index]);
+            }
+        });
 
-    // Start building HTML
-    let html = `
-        <h2 style="margin: 0 0 10px 0; color: black;">Comments</h2>
-        <hr>
-        <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
-    `;
-
-    uniqueComments.forEach((text, idx) => {
-        html += `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 0;">
-                <div style="display: flex; gap: 15px;">
-                    <div style="width: 50px; height: 50px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">👤</div>
-                    <div>
-                        <p style="margin: 0; font-weight: 600; color: #2e7166;">Department Name</p>
-                        <p style="margin: 0; font-size: 14px; color: #444;">${text}</p>
-                    </div>
-                </div>
-                <p style="color: #666; font-size: 14px;">${new Date(uniqueDates[idx]).toLocaleDateString()}</p>
-            </div>
+        // Start building HTML
+        let html = `
+            <h2 style="margin: 0 0 10px 0; color: black;">Comments</h2>
+            <hr>
+            <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
         `;
-    });
 
-    html += `</div>`; // close scrollable div
+        uniqueComments.forEach((text, idx) => {
+            html += `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 0;">
+                    <div style="display: flex; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">👤</div>
+                        <div>
+                            <p style="margin: 0; font-weight: 600; color: #2e7166;">Department Name</p>
+                            <p style="margin: 0; font-size: 14px; color: #444;">${text}</p>
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 14px;">${new Date(uniqueDates[idx]).toLocaleDateString()}</p>
+                </div>
+            `;
+        });
 
-    document.getElementById('commentContent').innerHTML = html;
-    document.getElementById('commentModal').style.display = 'flex';
-}
+        html += `</div>`; // close scrollable div
+
+        document.getElementById('commentContent').innerHTML = html;
+        document.getElementById('commentModal').style.display = 'flex';
+    }
 
 
-function closeModal() {
-    document.getElementById('commentModal').style.display = 'none';
-}
+    function closeModal() {
+        document.getElementById('commentModal').style.display = 'none';
+    }
 
 </script>
 
