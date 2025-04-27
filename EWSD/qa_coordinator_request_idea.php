@@ -62,6 +62,7 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
             <a class="nav-link" href="qa_coordinator_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
             <a class="nav-link-active" href="qa_coordinator_request_idea.php">Request Idea</a>
             <a class="nav-link" href="qa_coordinator_idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_coordinator_annoucement.php"><i class="fa-regular fa-lightbulb"></i> Annoucement</a> 
             <!-- <a class="nav-link" href="register.php"><b>User Registration</b></a>
             <a class="nav-link" href="change_password.php"><b>Change Password</b></a> -->
             <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>

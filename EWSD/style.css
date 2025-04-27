@@ -482,3 +482,108 @@
 .department-table .action .edit-btn{
   color: #2F6CD0;
 }
+
+/* QA manager style start */
+.enable-staff-btn,
+.disable-staff-btn {
+  display: inline-block;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.enable-staff-btn {
+  background-color: #28a745; 
+}
+
+.enable-staff-btn:hover {
+  background-color: #218838;
+}
+
+.disable-staff-btn {
+  background-color: #dc3545; 
+}
+
+.disable-staff-btn:hover {
+  background-color: #c82333;
+}
+.qa-manager-dash-section {
+  flex-basis: 100%;
+  background-color: #59417B;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.qa-manager-dash-section .qa-manager-dash-header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin: 0; /* Remove all margins */
+  padding: 0; /* Remove all padding */
+}
+
+.qa-manager-dash-section .qa-manager-dash-header .qa-manager-search-input {
+  visibility: hidden; /* Hide it but keep space */
+  width: 0; /* Optional, ensure no space is taken up */
+}
+
+.qa-manager-dash-section .qa-manager-dash-header .qa-manager-search-input input {
+  border-radius: 10px;
+  border: none;
+  width: 100%;
+  font-size: 16px;
+}
+
+.qa-manager-dash-section .qa-manager-dash-header .qa-manager-user-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-end; /* Ensures the profile image stays at the right */
+}
+
+.qa-manager-dash-section .qa-manager-dash-header .qa-manager-user-display img {
+  border-radius: 50%; /* This makes the image round */
+  width: 50px;        /* Adjust to desired size */
+  height: 50px;       /* Ensure height matches width for a circle */
+  object-fit: cover;  /* Ensure the image fits well inside the circle */
+}
+
+.qa-manager-dash-section .qa-manager-dash-header .qa-manager-user-display .user-name {
+  font-size: 16px;
+  color: #fff;
+}
+
+#category-sections .view-all-cat {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 10px; 
+  background-color: #178fff; 
+  color: white; 
+  cursor: pointer;
+  text-decoration: none;
+}
+
+#category-sections .view-all-cat:hover {
+  background-color: #3b9bf6; 
+}
+.popup-message {
+  position: fixed;
+  top:10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #3c9a72;
+  color: white;
+  padding: 30px 28px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  font-size: 18px;
+  opacity: 0;
+  animation: fadeInOut 2.5s ease forwards;
+}

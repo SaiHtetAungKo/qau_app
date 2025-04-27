@@ -126,8 +126,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="logo text-center">
                 <h2>LOGO</h2>
             </div>
-            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-house"></i> Categories</a>
-            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-solid fa-users"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_manager_dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-layer-group"></i> Categories</a>
+            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_manager_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
+            <a class="nav-link" href="qa_manager_hidden_idea_list.php"><i class="fa-regular fa-eye-slash"></i> Hidden Idea List</a>
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
 
@@ -143,19 +146,23 @@ while ($row = mysqli_fetch_assoc($result)) {
 
             <!-- Category Section -->
             <div id="category-sections" style="display: block;">
-                <h3>🔥 Top 3 Popular Categories</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>🔥 Top 3 Popular Categories</h3>
+                    <a href="qa_manager_all_cat_list.php" class="view-all-cat">
+                        View All <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <div class="categories">
                     <?php foreach ($topCategories as $cat) { ?>
                         <div class="category-card">
                             <img src="images/dummy_category.png" alt="" class="category-image">
-                            <h4>
-                           
-    <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
-
-    </h4>
-    <h4>               
-    <?php echo htmlspecialchars($cat['SubCategoryTitle']); ?>
-    </h4>
+                            <h4>                           
+                                <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
+                            </h4>
+                            <h4>               
+                                <?php echo htmlspecialchars($cat['SubCategoryTitle']); ?>
+                            </h4>
                             <p>Total Ideas: <?php echo $cat['idea_count']; ?></p>
                             <a href="qa_manager_idea_list.php?category_name=<?php echo urlencode($cat['MainCategoryTitle']); ?>">
                             <span class="arrow">&rarr;</span>
