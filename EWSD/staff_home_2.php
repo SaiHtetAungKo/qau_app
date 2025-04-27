@@ -120,7 +120,7 @@ $userName = $_SESSION['userName'];
         .selected {
             background-color: #79D7BE;
             /* Bootstrap primary */
-            
+
         }
 
         .comment-entry {
@@ -210,7 +210,8 @@ $userName = $_SESSION['userName'];
             transform: translateY(-2px);
             /* Subtle lift */
         }
-        .idea-upload-box{
+
+        .idea-upload-box {
             cursor: pointer;
         }
     </style>
