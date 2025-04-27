@@ -33,7 +33,7 @@ $query = "
     FROM users u
     INNER JOIN roles r ON u.role_id = r.role_id
     INNER JOIN departments d ON u.department_id = d.department_id
-    WHERE r.role_type = 'QA coordinator ' AND u.department_id = ?
+    WHERE r.role_type = 'staff' AND u.department_id = ?
 ";
 $stmt = $connection->prepare($query);
 $stmt->bind_param('i', $userDepartmentId);
