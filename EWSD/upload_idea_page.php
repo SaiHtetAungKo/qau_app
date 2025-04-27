@@ -1,480 +1,470 @@
 <?php
-
+// Include and use the connection class
 session_start();
-include('connection.php');
-include('users_table.php');
+include 'connection.php';
+
+// Include PHPMailer classes manually
+require 'PHPMailer/Exception.php';
 require 'PHPMailer/PHPMailer.php';
 require 'PHPMailer/SMTP.php';
-require 'PHPMailer/Exception.php';
 
+// Use PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-if (!isset($_SESSION['userID'])) {
-    echo "<script>
-        alert('Please Login First');
-        window.location = 'index.php';
-    </script>";
-    exit();
+$database = new Connect();
+$conn = $database->getConnection();
+
+// Assuming you have a way to get the logged-in user's department_id
+$loggedInUserDepartmentId = 1; // Example, replace this with the actual logged-in user's department ID
+
+// Get the QA Coordinator's email for the same department
+$qaCoordinatorQuery = "SELECT user_email FROM users WHERE role_id = 3 AND department_id = $loggedInUserDepartmentId";
+$qaCoordinatorResult = mysqli_query($conn, $qaCoordinatorQuery);
+
+if ($qaCoordinatorRow = mysqli_fetch_assoc($qaCoordinatorResult)) {
+    $qaCoordinatorEmail = $qaCoordinatorRow['user_email'];
+} else {
+    // Handle case where no coordinator is found
+    $qaCoordinatorEmail = null;
 }
 
+// Handle AJAX request for subcategories
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['main_category_id'])) {
+    $mainCatId = intval($_POST['main_category_id']);
+    $result = mysqli_query($conn, "SELECT * FROM subcategory WHERE MainCategoryID = $mainCatId");
+
+    echo '<option value="">Select Sub Category</option>';
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo '<option value="' . $row['SubCategoryID'] . '">' . htmlspecialchars($row['SubCategoryTitle']) . '</option>';
+    }
+    exit; // Stop the rest of the page from loading
+}
+
+$today = date('Y-m-d');
+
+// Query to fetch request idea whose closure_date >= today's date
+$requestQuery = "SELECT * FROM request_ideas WHERE closure_date >= '$today' ORDER BY closure_date ASC LIMIT 1";
+
+$result = mysqli_query($conn, $requestQuery);
+$latestRequest = mysqli_fetch_assoc($result);
+
+// If there is an active request idea, fetch its details
+if ($latestRequest) {
+    $requestIdeaId = $latestRequest['requestIdea_id'];
+    $closureDate = $latestRequest['closure_date'];
+} else {
+    $requestIdeaId = null;
+    $closureDate = null;
+}
+
+$isDisabled = false;
+$user_id = $_SESSION['userID'];
 $userName = $_SESSION['userName'];
-$userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
+if ($user_id) {
+    $query = "SELECT account_status FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
 
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "quality_assurance";  // Replace with your actual database name
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if (isset($_GET['action']) || isset($_POST['action'])) {
-    $action = $_GET['action'] ?? $_POST['action'];
-
-
-    if ($action === 'get_main_categories') {
-        $result = $conn->query("SELECT MainCategoryID, MainCategoryTitle FROM maincategory");
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
-        }
-        echo json_encode($data);
-        exit;
+    if ($user && $user['account_status'] !== 'active') {
+        $isDisabled = true;
     }
-
-    if ($action === 'get_sub_categories') {
-        $main_id = (int)($_GET['main_id'] ?? $_POST['main_id']);
-        $result = $conn->query("SELECT SubCategoryID, SubCategoryTitle FROM subcategory WHERE MainCategoryID = $main_id");
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
-        }
-        echo json_encode($data);
-        exit;
-    }
+} else {
+    // User not logged in
+    $isDisabled = true;
 }
 
-// Check if form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Handle Idea Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idea_title'])) {
+    // Collect form data
+    $mainCatId = intval($_POST['main_category']);
+    $subCatId = intval($_POST['sub_category']);
+    $title = mysqli_real_escape_string($conn, $_POST['idea_title']);
+    $description = mysqli_real_escape_string($conn, $_POST['idea_description']);
+    $anonymous = isset($_POST['anonymous']) ? 1 : 0;
+    $userID = 1; // Change to dynamic logged-in user ID if needed
+    $status = 'pending'; // or default value you use
+    $imgPath = NULL;
 
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+    // Handle image upload if exists
+    if (isset($_FILES['idea_image']) && $_FILES['idea_image']['error'] === 0) {
+        $targetDir = "Images/";
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+        $fileName = time() . '_' . basename($_FILES["idea_image"]["name"]);
+        $targetFilePath = $targetDir . $fileName;
+
+        if (move_uploaded_file($_FILES["idea_image"]["tmp_name"], $targetFilePath)) {
+            $imgPath = $targetFilePath;
+        }
     }
 
-    // Check if file is uploaded
-    if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
-        // Validate image type
-        $fileTmp = $_FILES['file']['tmp_name'];
-        $check = getimagesize($fileTmp);
-        if ($check === false) {
-            echo "The uploaded file is not a valid image.";
-            exit;
-        }
+    // If there's an active request idea, use its ID, otherwise set to NULL
+    $requestIdeaIdToInsert = $requestIdeaId ? $requestIdeaId : NULL;
 
-        $fileName = basename($_FILES['file']['name']);
-        $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+    // Insert into ideas table
+    $query = "INSERT INTO ideas (userID, requestIdea_id, SubCategoryID, title, description, img_path, status, anonymousSubmission, created_at, updated_at) 
+              VALUES ('$userID', " .
+        ($requestIdeaIdToInsert ? "'$requestIdeaIdToInsert'" : "NULL") . ",  '$subCatId', '$title', '$description', " .
+        ($imgPath ? "'$imgPath'" : "NULL") . ", 
+              '$status', '$anonymous', NOW(), NOW())";
 
-        $uploadDir = 'Images/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-        $targetPath = $uploadDir . $fileName;
-        $baseFileName = pathinfo($fileName, PATHINFO_FILENAME);
-        $counter = 1;
-        while (file_exists($targetPath)) {
-            // Generate new filename with a counter: "image (1).jpg", "image (2).jpg", etc.
-            $newFileName = $baseFileName . ' (' . $counter . ').' . $fileExt;
-            $targetPath = $uploadDir . $newFileName; // Update the path with the new filename
-            $counter++; // Increment the counter
-        }
+    if (mysqli_query($conn, $query)) {
+        // Send email to QA Coordinator using PHPMailer
+        if ($qaCoordinatorEmail) {
+            $mail = new PHPMailer(true);
 
+            try {
+                //Server settings
+                $mail->isSMTP();  // Set mailer to use SMTP
+                $mail->Host = 'smtp.gmail.com';  // Set the SMTP server
+                $mail->SMTPAuth = true;  // Enable SMTP authentication
+                $mail->Username = 'opengate171@gmail.com';  // Your Gmail address
+                $mail->Password = 'mnsh lxzg txel skbr';  // Your Gmail password or app password
+                $mail->SMTPSecure = 'tls';  // Enable TLS encryption
+                $mail->Port = 587;  // TCP port to connect to
 
-        // Move uploaded file to the target directory
-        if (move_uploaded_file($fileTmp, $targetPath)) {
-            // Get form data
-            $userID = 1; // Replace this with actual user ID (e.g., from $_SESSION)
-            $subCategoryID = $_POST['subCategory'];
-            $suggestion = htmlspecialchars($_POST['suggestion']);
+                //Recipients
+                $mail->setFrom('opengate171@gmail.com', 'Idea Submission System');
+                $mail->addAddress($qaCoordinatorEmail);  // QA Coordinator's email
 
+                //Content
+                $mail->isHTML(true);  // Set email format to HTML
+                $mail->Subject = 'New Idea Submitted: ' . $title;
+                $mail->Body    = "Hello QA Coordinator,<br><br>A new idea has been submitted.<br><br>" .
+                    "<strong>Title:</strong> $title<br>" .
+                    "<strong>Description:</strong> $description<br><br>" .
+                    "Please review it.<br><br>" .
+                    "Best regards,<br>Your Idea Submission System";
 
-            // Insert data into the 'idea' table
-            $stmt = $conn->prepare("INSERT INTO ideas (userID, SubCategoryID, description, image_path) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("iiss", $userID, $subCategoryID, $suggestion, $targetPath);
-
-            if ($stmt->execute()) {
-
-                // Email notification
-
-
-                $mail = new PHPMailer(true);
-
-                try {
-                    // Mailtrap SMTP settings
-                    $mail->isSMTP();
-                    $mail->Host       = 'sandbox.smtp.mailtrap.io';
-                    $mail->SMTPAuth   = true;
-                    $mail->Username   = '883613232c3b68'; // Replace with your Mailtrap credentials
-                    $mail->Password   = '9684fa048f7638';
-                    $mail->Port       = 2525;
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-
-                    $mail->setFrom('noreply@example.com', 'Idea Box');
-                    $mail->addAddress('admin@example.com'); // Change to recipient (e.g., admin or yourself)
-
-                    $mail->isHTML(true);
-                    $mail->Subject = 'New Idea Submitted';
-                    $mail->Body    = "
-                                        <p>Someone posted Idea</p>
-                                    ";
-
-                    $mail->send();
-                    echo "Idea uploaded successfully! Email sent.";
-                } catch (Exception $e) {
-                    echo "Idea uploaded, but email failed to send. Error: {$mail->ErrorInfo}";
-                }
-
-                echo "Idea uploaded successfully!";
-            } else {
-                echo "Error: " . $stmt->error;
+                $mail->send();
+                echo "<script>alert('Idea uploaded successfully! An email has been sent to the QA Coordinator.'); window.location.href='upload_idea_page.php';</script>";
+            } catch (Exception $e) {
+                echo "<script>alert('Idea uploaded successfully, but email could not be sent.'); window.location.href='upload_idea_page.php';</script>";
             }
-
-            $stmt->close();
         } else {
-            echo "Failed to upload image.";
+            echo "<script>alert('Idea uploaded successfully, but no QA Coordinator email found.'); window.location.href='upload_idea_page.php';</script>";
         }
     } else {
-        echo "No file uploaded or upload error.";
+        echo "<script>alert('Error uploading idea.'); window.location.href='upload_idea_page.php';</script>";
     }
-
-    $conn->close();
-    exit;
 }
 
-?>
 
+
+// Otherwise, normal page loading
+$mainCategories = mysqli_query($conn, "SELECT * FROM maincategory WHERE Status = 'active'");
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
     <title>Upload Idea</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" />
     <style>
-        /* Fullscreen Container */
-        body,
-        html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+        /* Same CSS styling */
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
             padding: 20px;
         }
 
-        /* Row to Fill Height */
-        .form-row {
-            flex-grow: 1;
-            display: flex;
+        .upload-container {
+
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
         }
 
-        /* File Upload Box */
-        .upload-box {
+        .left-side,
+        .right-side {
+            padding: 20px;
+        }
+
+        .left-side {
+            flex: 1;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area {
             border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 40px;
-            background-color: #fafafa;
-            transition: 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            /* Stack items vertically */
-            align-items: center;
-            justify-content: center;
-            height: calc(100vh - 200px);
-            position: relative;
-            text-align: center;
-        }
-
-        #fileName {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            border-radius: 10px;
             width: 100%;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            background-color: #fafafa;
         }
 
-        /* Highlight on Drag Over */
-        .upload-box.dragover {
-            border-color: #007bff;
-            background-color: #e9f5ff;
+        .upload-area.dragover {
+            background-color: #e0e0e0;
         }
 
-        /* Upload Icon */
-        .upload-icon {
-            font-size: 50px;
-            /* Adjust size */
-            margin-bottom: 10px;
-            color: #007bff;
+        .right-side {
+            flex: 2;
         }
 
-        /* Form Fields */
+        input,
+        select,
         textarea {
-            resize: none;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
         button {
-            width: 100%;
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        input[type="checkbox"] {
-            accent-color: #007bff;
+        button:hover {
+            background-color: #45a049;
         }
 
-        input[type="checkbox"]:checked+label {
-            color: #007bff;
+        .terms {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 20px;
         }
 
-        #mainCategory,
-        #subCategory {
-            border: 1px solid black !important;
+        .upload-file-info {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .upload-file-info img {
+            width: 50px;
             height: 50px;
-            border-radius: 10px;
-
+            margin-bottom: 10px;
         }
 
-        #suggestion {
-            border: 1px solid black !important;
-            border-radius: 10px;
-
+        .upload-file-info p {
+            font-size: 14px;
+            margin: 0;
         }
 
-        hr {
-            display: block;
-            /* Ensure it is visible */
-            border: 1px solid #000;
-            /* Add a visible border */
-            margin: 20px 0;
-            /* Add spacing */
+        .anonoymous {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .anonoymous input {
+            width: fit-content;
+            margin: 0px;
+        }
+
+        .terms {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terms input {
+            width: fit-content;
+            margin: 0px;
+        }
+
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .line-space {
+            width: 100%;
+            height: 1px;
+            background: #ddd;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 
 <body>
+    <!-- Request Idea and Closure Date -->
+    <!-- <?php if ($latestRequest): ?>
+        <div class="request-idea-info">
+            <p><strong>Latest Request Idea:</strong> <?= htmlspecialchars($latestRequest['title']) ?></p>
+            <p><strong>Closure Date:</strong> <?= date('F j, Y', strtotime($closureDate)) ?></p>
+        </div>
+    <?php else: ?>
+        <p>No active request ideas at the moment.</p>
+    <?php endif; ?> -->
+    <?php if ($isDisabled): ?>
+        <div class="alert alert-danger mt-2">Your account is not active. You cannot post ideas.</div>
+    <?php else: ?>
 
-    <div class="container">
-        <h2 class="font-weight-bold">Upload Idea</h2>
-        <div class="text-end font-weight-bold">Closure Date: <span id="closureDate"></span></div>
-        <hr />
+        <form action="" method="POST" enctype="multipart/form-data">
+            <div class="upload-container">
+                <div class="upload-header">
+                    <h2>Upload Idea Form</h2>
+                    <!-- Request Idea and Closure Date -->
+                    <?php if ($latestRequest): ?>
+                        <div class="request-idea-info">
+                            <?php echo "QA Coordinator email: " . $qaCoordinatorEmail; ?>
+                            <p><strong>Closure Date:</strong> <?= date('F j, Y', strtotime($closureDate)) ?></p>
+                        </div>
+                    <?php else: ?>
+                        <p>No active request ideas at the moment.</p>
+                    <?php endif; ?>
+                </div>
+                <div class="line-space"></div>
 
-        <form id="ideaForm" action="upload.php" method="POST" enctype="multipart/form-data" class="mt-3">
-            <div class="row form-row">
-                <!-- File Upload Box -->
-                <div class="col-md-6">
-                    <div class="upload-box" id="dropZone">
-                        <input type="file" id="fileInput" name="file" class="d-none" accept="image/*" />
-                        <div id="fileName">
-                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                            <p>Drop Files to upload<br><small>(or click to select)</small></p>
+                <!-- Left Side: Image Upload -->
+                <div style="display: flex;">
+                    <div class="left-side">
+                        <div class="upload-area" id="uploadArea">
+                            <div id="uploadText">
+                                <p>Drag & Drop File Here<br>or<br>Click to Upload</p>
+                            </div>
+                            <input type="file" name="idea_image" id="fileInput" style="display: none;">
                         </div>
                     </div>
-                </div>
 
-                <!-- Form Fields -->
-                <div class="col-md-6">
-                    <div class="form-group mb-4">
-                        <label for="mainCategory" class="mb-2">Main Category</label>
-                        <select class="form-control" id="mainCategory" name="mainCategory" required>
-                            <option value="">Choose main category</option>
+                    <!-- Right Side: Form Fields -->
+                    <div class="right-side">
+
+                        <!-- Main Category -->
+                        <label for="main_category">Main Category</label>
+                        <select name="main_category" id="main_category" required>
+                            <option value="">Select Main Category</option>
+                            <?php while ($row = mysqli_fetch_assoc($mainCategories)): ?>
+                                <option value="<?= $row['MainCategoryID'] ?>"><?= htmlspecialchars($row['MainCategoryTitle']) ?></option>
+                            <?php endwhile; ?>
                         </select>
-                    </div>
 
-                    <div class="form-group mb-4">
-                        <label for="subCategory" class="mb-2">Sub Category</label>
-                        <select class="form-control" id="subCategory" name="subCategory" required disabled>
-                            <option value="">Choose sub category</option>
+                        <!-- Sub Category (dynamic) -->
+                        <label for="sub_category">Sub Category</label>
+                        <select name="sub_category" id="sub_category" disabled required>
+                            <option value="">Select Sub Category</option>
                         </select>
-                    </div>
 
-                    <div class="form-group mb-4">
-                        <label for="suggestion" class="mb-2">Suggestion</label>
-                        <textarea class="form-control" id="suggestion" name="suggestion" rows="10" placeholder="Enter Suggestion" required></textarea>
-                    </div>
+                        <!-- Title -->
+                        <label for="idea_title">Idea Title</label>
+                        <input type="text" name="idea_title" id="idea_title" required>
 
-                    <div class="form-group mb-4">
-                        <input type="checkbox" id="terms" required />
-                        <label for="terms">I have agreed to <a href="#">Terms & Conditions</a></label>
-                    </div>
+                        <!-- Description -->
+                        <label for="idea_description">Idea Description</label>
+                        <textarea name="idea_description" id="idea_description" rows="5" style="resize: none;" required></textarea>
 
-                    <button type="submit" class="btn btn-success">Post</button>
+                        <!-- Anonymous Checkbox -->
+                        <div class="anonoymous">
+                            <input type="checkbox" name="anonymous" id="anonymous" value="1">
+                            <label for="anonymous">Submit Anonymously</label>
+                        </div>
+                        <br>
+                        <!-- Terms -->
+                        <div class="terms">
+                            <input type="checkbox" name="" id="">
+                            By submitting, you agree to our Terms and Conditions.
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit">Submit Idea</button>
+
+                    </div>
                 </div>
             </div>
         </form>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <?php endif; ?>
     <script>
-        // Load main categories
-        $.ajax({
-            url: 'upload_idea_page.php',
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                action: 'get_main_categories'
-            },
-            success: function(data) {
-                const mainSelect = $('#mainCategory');
-                mainSelect.empty().append('<option value="">Choose main category</option>');
-                $.each(data, function(i, category) {
-                    mainSelect.append(`<option value="${category.MainCategoryID}">${category.MainCategoryTitle}</option>`);
-                });
-            },
-            error: function() {
-                alert('Failed to load main categories.');
+        // Drag and Drop Upload Handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadText = document.getElementById('uploadText');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            fileInput.files = e.dataTransfer.files;
+            showFileInfo(fileInput.files[0]);
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                showFileInfo(fileInput.files[0]);
             }
         });
 
-        // Load subcategories
-        $('#mainCategory').on('change', function() {
-            const mainCategoryId = $(this).val();
-            const subSelect = $('#subCategory');
+        function showFileInfo(file) {
+            let fileType = file.type;
+            let iconSrc = '';
 
-            if (mainCategoryId) {
-
-                subSelect.prop('disabled', false);
-
-                $.ajax({
-                    url: 'upload_idea_page.php',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        action: 'get_sub_categories',
-                        main_id: mainCategoryId
-                    },
-                    success: function(data) {
-                        subSelect.empty().append('<option value="">Choose sub category</option>');
-                        $.each(data, function(i, sub) {
-                            subSelect.append(`<option value="${sub.SubCategoryID}">${sub.SubCategoryTitle}</option>`);
-                        });
-                    },
-                    error: function() {
-                        alert('Failed to load sub categories.');
-                    }
-                });
+            if (fileType.startsWith('image/')) {
+                iconSrc = 'https://img.icons8.com/fluency/48/image.png'; // Image Icon
+            } else if (fileType === 'application/zip' || fileType === 'application/x-zip-compressed') {
+                iconSrc = 'https://img.icons8.com/fluency/48/zip.png'; // Zip Icon
+            } else if (fileType === 'application/pdf') {
+                iconSrc = 'https://img.icons8.com/fluency/48/pdf.png'; // PDF Icon
+            } else if (fileType.startsWith('application/msword') || fileType.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+                iconSrc = 'https://img.icons8.com/fluency/48/word.png'; // Word Icon
             } else {
-                subSelect.prop('disabled', true);
-                subSelect.html('<option value="">Choose sub category</option>');
-            }
-        });
-
-
-        $(document).ready(function() {
-            const dropZone = $('#dropZone');
-            const fileInput = $('#fileInput');
-            const fileName = $('#fileName');
-
-            // Open file select dialog when clicking the upload box
-            dropZone.on('click', function(e) {
-                if (e.target !== fileInput[0]) {
-                    fileInput.click();
-                }
-            });
-
-            // Handle file select
-            fileInput.on('change', function() {
-                if (this.files && this.files[0]) {
-                    handleFile(this.files[0]);
-                }
-            });
-
-            // Drag and Drop Events
-            dropZone.on('dragover', function(e) {
-                e.preventDefault();
-                dropZone.addClass('dragover');
-            });
-
-            dropZone.on('dragleave', function() {
-                dropZone.removeClass('dragover');
-            });
-
-            dropZone.on('drop', function(e) {
-                e.preventDefault();
-                dropZone.removeClass('dragover');
-                let files = e.originalEvent.dataTransfer.files;
-                if (files.length) {
-                    handleFile(files[0]);
-                }
-            });
-
-            // Handle File Selection
-            function handleFile(file) {
-
-                if (!file.type.startsWith('image/')) {
-                    alert('Only image files are allowed!');
-                    fileInput.val(''); // Reset input
-                    return;
-                }
-
-                // Show file name in the box
-                fileName.html(`<i class="fas fa-file-alt upload-icon"></i>
-                                <p>${file.name}</p>`);
+                iconSrc = 'https://img.icons8.com/fluency/48/file.png'; // Default file icon
             }
 
-            $('#ideaForm').on('submit', function(e) {
-                e.preventDefault(); // Prevent default form submission
+            uploadText.innerHTML = `
+        <div class="upload-file-info">
+            <img src="${iconSrc}" alt="file type">
+            <p>${file.name}</p>
+        </div>
+    `;
+        }
 
-                // Basic front-end validation
-                if (!$('#fileInput').val()) {
-                    alert('Please upload a file.');
-                    return;
-                }
+        // AJAX to load Sub Categories
+        document.getElementById('main_category').addEventListener('change', function() {
+            var mainCatId = this.value;
+            var subCatSelect = document.getElementById('sub_category');
 
-                if (!$('#mainCategory').val() || !$('#subCategory').val() || !$('#suggestion').val()) {
-                    alert('Please fill all fields.');
-                    return;
-                }
+            if (!mainCatId) {
+                subCatSelect.innerHTML = '<option value="">Select Sub Category</option>';
+                subCatSelect.disabled = true;
+                return;
+            }
 
-                if (!$('#terms').is(':checked')) {
-                    alert('You must agree to the Terms & Conditions.');
-                    return;
-                }
+            subCatSelect.disabled = false;
+            subCatSelect.innerHTML = '<option>Loading...</option>';
 
-                // Prepare form data
-                let formData = new FormData(this);
-
-                // Send data via AJAX
-                $.ajax({
-                    url: '',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-
-                        $('#ideaForm')[0].reset(); // Reset form
-                        $('#fileName').html(`<i class="fas fa-cloud-upload-alt upload-icon"></i>
-                                 <p>Drop Files to upload<br><small>(or click to select)</small></p>`);
-
-                        window.location.href = 'staff_home_2.php';
-
-                    },
-                    error: function() {
-                        alert('Something went wrong. Please try again.');
-                    }
-                });
-            });
-
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '', true); // Post to same page
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                subCatSelect.innerHTML = this.responseText;
+            }
+            xhr.send('main_category_id=' + mainCatId);
         });
     </script>
+
 </body>
 
 </html>
