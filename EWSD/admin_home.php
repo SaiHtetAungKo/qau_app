@@ -16,6 +16,54 @@ if (!isset($_SESSION['userID'])) {
 // Fetch user data from session
 $userName = $_SESSION['userName'];
 $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
+
+// Count for role_id = 2
+$sql_role2 = "SELECT COUNT(*) as role2_count FROM users WHERE role_id = 2";
+$result_role2 = mysqli_query($connection, $sql_role2);
+$row_role2 = mysqli_fetch_assoc($result_role2);
+$role2Count = $row_role2['role2_count'];
+
+// Count for role_id = 3
+$sql_role3 = "SELECT COUNT(*) as role3_count FROM users WHERE role_id = 3";
+$result_role3 = mysqli_query($connection, $sql_role3);
+$row_role3 = mysqli_fetch_assoc($result_role3);
+$role3Count = $row_role3['role3_count'];
+
+// Count for role_id = 4
+$sql_role4 = "SELECT COUNT(*) as role4_count FROM users WHERE role_id = 4";
+$result_role4 = mysqli_query($connection, $sql_role4);
+$row_role4 = mysqli_fetch_assoc($result_role4);
+$role4Count = $row_role4['role4_count'];
+
+// Query count for department
+$departmentsquery = "SELECT COUNT(*) as department_count FROM departments";
+$result_departments = mysqli_query($connection, $departmentsquery);
+$row_departments = mysqli_fetch_assoc($result_departments);
+$departmentCount = $row_departments['department_count'];
+
+$ideaquey = "
+SELECT i.*, COUNT(iv.ideavoteID) AS like_count
+FROM ideas i
+LEFT JOIN idea_vote iv ON i.idea_id = iv.idea_id AND iv.votetype = 1
+GROUP BY i.idea_id
+ORDER BY like_count DESC
+LIMIT 4
+";
+
+$result = mysqli_query($connection, $ideaquey);
+
+$votequery = "
+SELECT i.*,
+    SUM(CASE WHEN iv.votetype = 1 THEN 1 ELSE 0 END) AS like_count,
+    SUM(CASE WHEN iv.votetype = 2 THEN 1 ELSE 0 END) AS dislike_count
+FROM ideas i
+LEFT JOIN idea_vote iv ON i.idea_id = iv.idea_id
+GROUP BY i.idea_id
+ORDER BY like_count DESC
+LIMIT 4
+";
+
+$result = mysqli_query($connection, $votequery);
 ?>
 
 <!DOCTYPE html>
@@ -29,6 +77,38 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
     <link rel="stylesheet" href="style.css">
     <title>Quality Assurance | Admin Home</title>
 </head>
+<style>
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+    }
+
+    .overlay-content {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        width: 70%;
+        max-height: 90%;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .close-btn {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        cursor: pointer;
+        font-size: 24px;
+    }
+</style>
 
 <body>
     <div class="admin-container">
@@ -72,79 +152,116 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
             <h6 class="dash-title">All Data</h6>
             <div class="data-box">
                 <div class="box-card">
-                    <h3 class="text-center">Count</h3>
-                    <span class="text-center">Hello</span>
+                    <h1 id="role2Count" class="text-center" data-count="<?php echo $role2Count; ?>">0</h1>
+                    <span class="text-center">QA Manager</span>
                 </div>
+
+                <!-- QA Coordinators (Role 3) -->
                 <div class="box-card">
-                    <h3 class="text-center">Count</h3>
-                    <span class="text-center">Hello</span>
+                    <h1 id="role3Count" class="text-center" data-count="<?php echo $role3Count; ?>">0</h1>
+                    <span class="text-center">QA Coordinators</span>
                 </div>
+
+                <!-- Jobseekers (Role 4) -->
                 <div class="box-card">
-                    <h3 class="text-center">Count</h3>
-                    <span class="text-center">Hello</span>
+                    <h1 id="role4Count" class="text-center" data-count="<?php echo $role4Count; ?>">0</h1>
+                    <span class="text-center">Staff</span>
                 </div>
+                <!-- Departments (Optional) -->
                 <div class="box-card">
-                    <h3>Count</h3>
-                    <span>Hello</span>
+                    <h1 id="departmentCount" class="text-center" data-count="<?php echo $departmentCount; ?>">0</h1>
+                    <span class="text-center">Departments</span>
                 </div>
 
             </div>
             <h6 class="dash-title">Posted Request Data</h6>
             <div class="idea-show">
-                <div class="idea-card">
-                    <div class="idea-card-head">
-                        <span class="idea-card-title">Title</span>
-                        <div class="idea-card-date">
-                            11/11/2025
+                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                    <div class="idea-card">
+                        <div class="idea-card-head">
+                            <span class="idea-card-title"><?php echo htmlspecialchars($row['title']); ?></span>
+                            <div class="idea-card-date">
+                                <?php echo date('d/m/Y', strtotime($row['created_at'])); ?>
+                            </div>
+                        </div>
+                        <p class="idea-desc">
+                            <?php echo htmlspecialchars(substr($row['description'], 0, 150)); ?>...
+                        </p>
+                        <div class="idea-show-bottom">
+                            <a href="#" onclick="openOverlay(<?php echo $row['idea_id']; ?>)">Detail</a>
+                            <div class="vote-show">
+                                <span class="vote" id="like-<?php echo $row['idea_id']; ?>" onclick="handleVote(<?php echo $row['idea_id']; ?>, 1)">
+                                    <?php echo $row['like_count']; ?> 👍
+                                </span>
+                                <span class="vote" id="unlike-<?php echo $row['idea_id']; ?>" onclick="handleVote(<?php echo $row['idea_id']; ?>, 2)">
+                                    <?php echo $row['dislike_count']; ?> 👎
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <p class="idea-desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur,
-                        molestias excepturi dignissimos praesentium odit officiis eius adipisci vero deleniti rerum asperiores,
-                        amet alias suscipit porro consequuntur saepe laudantium dicta! Distinctio.</p>
-                    <a href="#">Detail</a>
-                </div>
-                <div class="idea-card">
-                    <div class="idea-card-head">
-                        <span class="idea-card-title">Title</span>
-                        <div class="idea-card-date">
-                            11/11/2025
-                        </div>
-                    </div>
-                    <p class="idea-desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur,
-                        molestias excepturi dignissimos praesentium odit officiis eius adipisci vero deleniti rerum asperiores,
-                        amet alias suscipit porro consequuntur saepe laudantium dicta! Distinctio.</p>
-                    <a href="#">Detail</a>
-                </div>
-                <div class="idea-card">
-                    <div class="idea-card-head">
-                        <span class="idea-card-title">Title</span>
-                        <div class="idea-card-date">
-                            11/11/2025
-                        </div>
-                    </div>
-                    <p class="idea-desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur,
-                        molestias excepturi dignissimos praesentium odit officiis eius adipisci vero deleniti rerum asperiores,
-                        amet alias suscipit porro consequuntur saepe laudantium dicta! Distinctio.</p>
-                    <a href="#">Detail</a>
-                </div>
-                <div class="idea-card">
-                    <div class="idea-card-head">
-                        <span class="idea-card-title">Title</span>
-                        <div class="idea-card-date">
-                            11/11/2025
-                        </div>
-                    </div>
-                    <p class="idea-desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur,
-                        molestias excepturi dignissimos praesentium odit officiis eius adipisci vero deleniti rerum asperiores,
-                        amet alias suscipit porro consequuntur saepe laudantium dicta! Distinctio.</p>
-                    <a href="#">Detail</a>
-                </div>
-
+                <?php endwhile; ?>
             </div>
+            <div id="ideaOverlay" class="overlay" style="display:none;">
+                <div class="overlay-content">
+                    <span class="close-btn" onclick="closeOverlay()">×</span>
+                    <div id="ideaDetailContent">
+                        <!-- Idea detail will be loaded here with JS -->
+                    </div>
+                </div>
+            </div>
+
 
         </div>
 
     </div>
+    <script>
+        function animateCount(id, duration = 1000) {
+            const counter = document.getElementById(id);
+            const target = +counter.getAttribute('data-count');
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                counter.innerText = Math.floor(progress * target);
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    counter.innerText = target;
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            animateCount('role2Count', 500); // Clients
+            animateCount('role3Count', 500); // QA Coordinators
+            animateCount('role4Count', 500); // Jobseekers
+            animateCount('departmentCount', 500); // Departments
+        });
+    </script>
+    <script>
+        function openOverlay(idea_id) {
+            // Show overlay
+            document.getElementById('ideaOverlay').style.display = 'flex';
+
+            // Fetch idea detail using AJAX
+            fetch('idea_detail.php?idea_id=' + idea_id)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('ideaDetailContent').innerHTML = data;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function closeOverlay() {
+            document.getElementById('ideaOverlay').style.display = 'none';
+        }
+    </script>
+
+
 
 
 </body>

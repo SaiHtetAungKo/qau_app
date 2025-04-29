@@ -143,7 +143,7 @@ if ($user_id) {
         .selected {
             background-color: #79D7BE;
             /* Bootstrap primary */
-            
+
         }
 
         .comment-entry {
@@ -233,7 +233,8 @@ if ($user_id) {
             transform: translateY(-2px);
             /* Subtle lift */
         }
-        .idea-upload-box{
+
+        .idea-upload-box {
             cursor: pointer;
         }
         .staff-btn-purple {

@@ -13,6 +13,16 @@ if (!isset($_SESSION['userID'])) {
     exit();
 }
 
+
+// Fetch the latest request idea
+$sql = "SELECT closure_date, final_closure_date FROM request_ideas ORDER BY requestIdea_id DESC LIMIT 1";
+$result = mysqli_query($connection, $sql);
+$request = mysqli_fetch_assoc($result);
+
+// Format for placeholder (optional: you can format it if needed)
+$closure_placeholder = isset($request['closure_date']) ? $request['closure_date'] : 'Closure Date';
+$final_closure_placeholder = isset($request['final_closure_date']) ? $request['final_closure_date'] : 'Final Closure Date';
+
 if (isset($_POST['btnPost'])) {
     $title = $_POST['txtTitle'];
     $closuredate = $_POST['closuredate'];
@@ -84,14 +94,18 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
                     <div class="input-flex-box">
                         <div class="input-box">
                             <label for="closure-date">Closure Date</label>
-                            <input type="date" name="closuredate" placeholder="Closer Date">
+                            <small>Latest Closure Date: <?php echo $closure_placeholder; ?></small>
+                            <input type="date" name="closuredate">
                         </div>
 
                         <div class="input-box">
                             <label for="final-closure-date">Final Closure Date</label>
-                            <input type="date" name="finalclosuredate" placeholder="Final Closer Date">
+                            <small>Latest Final Closure Date: <?php echo $final_closure_placeholder; ?></small>
+                            <input type="date" name="finalclosuredate">
                         </div>
                     </div>
+
+
                     <div class="input-box">
                         <label for="title">Title</label>
                         <input type="text" name="txtTitle" placeholder="Closer Date">
