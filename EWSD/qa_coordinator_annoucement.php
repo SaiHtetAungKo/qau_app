@@ -56,25 +56,22 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <style>body {
-  background-color: #b999e5;
-  font-family: Arial, sans-serif;
-  color: white;
-  padding: 30px;
-}
-
+    <style>
 .form-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
   max-width: 600px;
-  margin: auto;
+  padding-top:25px;
 }
 
 label {
   font-size: 1.2rem;
 }
-
+strong{
+  color: White;
+  text-decoration: none;
+}
 input,
 textarea {
   background-color: white;
@@ -92,7 +89,7 @@ textarea {
 }
 
 button {
-  align-self: center;
+  align-self: lea;
   padding: 10px 40px;
   background-color: #7ee0c2;
   color: white;
@@ -151,10 +148,10 @@ button:hover {
                 </div>
             </header>
             <div class="form-container">
-                <label for="title"><u><strong>Announcement Title</strong></u></label>
+                <label for="title" name="a-title"><u><strong>Announcement Title</strong></u></label>
                 <input type="text" id="title" name="title" placeholder="Enter title..." />
 
-                <label for="description"><strong>Description</strong></label>
+                <label for="description" name="a-title"><strong>Description</strong></label>
                 <textarea id="description" name="description" rows="8" placeholder="Enter description..."></textarea>
 
                 <input type="hidden" name="d-id" value="<?php echo htmlspecialchars($departmentID);?>" >
