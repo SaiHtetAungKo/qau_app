@@ -169,8 +169,11 @@
     padding: 3rem 5px;
     text-align: center;
 }
-.admin-container .dash-section .data-box .box-card h3, .admin-container .dash-section .data-box .box-card span{
-    margin: 5px;
+.admin-container .dash-section .data-box .box-card{
+
+}
+.admin-container .dash-section .data-box .box-card h1, .admin-container .dash-section .data-box .box-card span{
+    margin: 2px;
 }
 .admin-container .dash-section .idea-show{
     position: relative;
@@ -198,6 +201,35 @@
 }
 .admin-container .dash-section .idea-show .idea-card .idea-card-head .idea-card-date{
    margin-right: 15px;
+}
+.admin-container .dash-section .idea-show .idea-show-bottom{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.admin-container .dash-section .idea-show .idea-show-bottom .vote-show{
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+.admin-container .dash-section .idea-show .idea-show-bottom .vote-show .vote{
+  background: #fff;
+  border: 1px solid #151515;
+  border-radius: 5px;
+  padding:6px 8px;
+  display: flex;
+  gap: 0.3rem;
+}
+.idea-comments{
+  height: 15rem;
+  overflow-y: auto;
+}
+.idea-votes{
+  
+  margin-top:20px; 
+  margin-bottom:20px; 
+  
+  
 }
 .admin-container .dash-section .staff-table {
     width: 100%;

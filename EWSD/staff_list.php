@@ -49,7 +49,7 @@ $result = $connection->query($query);
             <a class="nav-link" href="admin_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link-active" href="staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
             <a class="nav-link" href="request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
-            <a class="nav-link" href="idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <a class="nav-link" href="idea_report.php"><i class="fa-regular fa-lightbulb"></i>Idea Reports</a>
             <a class="nav-link" href="register.php"><b>User Registration</b></a>
             <a class="nav-link" href="change_password.php"><b>Change Password</b></a>
             <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
@@ -91,8 +91,8 @@ $result = $connection->query($query);
                                     <td><?php echo htmlspecialchars($row['department_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['created_at']); ?></td>
                                     <td>
-                                        <a href="edit_staff.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
-                                        <a href="delete_staff.php?id=<?php echo $row['user_id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
+                                        <a href="editstaff.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
+                                        <a href="deletestaff.php?id=<?php echo $row['user_id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
                                     </td>
                                 </tr>
                             <?php } ?>
