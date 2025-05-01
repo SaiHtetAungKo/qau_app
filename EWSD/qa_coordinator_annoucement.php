@@ -57,23 +57,21 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      background-color: #b999e5;
-      font-family: Arial, sans-serif;
-      color: white;
-      padding: 30px;
-    }
-
     .form-container {
       display: flex;
       flex-direction: column;
       gap: 20px;
       max-width: 600px;
-      margin: auto;
+      padding-top: 25px;
     }
 
     label {
       font-size: 1.2rem;
+    }
+
+    strong {
+      color: White;
+      text-decoration: none;
     }
 
     input,
@@ -93,7 +91,7 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
     }
 
     button {
-      align-self: center;
+      align-self: lea;
       padding: 10px 40px;
       background-color: #7ee0c2;
       color: white;
@@ -131,39 +129,30 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
         <div class="logo text-center">
           <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
         </div>
-        <a class="nav-link" href="qa_coordinator_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-        <a class="nav-link" href="qa_coordinator_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
-        <!-- <a class="nav-link" href="qa_coordinator_request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a> -->
-        <!-- <a class="nav-link" href="qa_coordinator_idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a> -->
-        <a class="nav-link-active" href="qa_coordinator_annoucement.php"><i class="fa-regular fa-lightbulb"></i> Annoucement</a>
-        <!-- <a class="nav-link" href="register.php"><b>User Registration</b></a> -->
-        <!-- <a class="nav-link" href="change_password.php"><b>Change Password</b></a> -->
-        <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
-      </div>
-      <div class="dash-section">
-        <header class="dash-header">
-          <div class="search-input">
-            <input type="search" placeholder="Search" aria-label="Search">
+        <div class="dash-section">
+          <header class="dash-header">
+            <div class="search-input">
+              <input type="search" placeholder="Search" aria-label="Search">
+            </div>
+            <div class="user-display">
+              <img src="<?php echo htmlspecialchars($userProfileImg); ?>"
+                alt="Profile Image">
+              <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
+            </div>
+          </header>
+          <div class="form-container">
+            <label for="title" name="a-title"><u><strong>Announcement Title</strong></u></label>
+            <input type="text" id="title" name="title" placeholder="Enter title..." />
+
+            <label for="description" name="a-title"><strong>Description</strong></label>
+            <textarea id="description" name="description" rows="8" placeholder="Enter description..."></textarea>
+
+            <input type="hidden" name="d-id" value="<?php echo htmlspecialchars($departmentID); ?>">
+
+            <button type="submit" name="btnsubmit">Post</button>
           </div>
-          <div class="user-display">
-            <img src="<?php echo htmlspecialchars($userProfileImg); ?>"
-              alt="Profile Image">
-            <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
-          </div>
-        </header>
-        <div class="form-container">
-          <label for="title"><u><strong>Announcement Title</strong></u></label>
-          <input type="text" id="title" name="title" placeholder="Enter title..." />
 
-          <label for="description"><strong>Description</strong></label>
-          <textarea id="description" name="description" rows="8" placeholder="Enter description..."></textarea>
-
-          <input type="hidden" name="d-id" value="<?php echo htmlspecialchars($departmentID); ?>">
-
-          <button type="submit" name="btnsubmit">Post</button>
         </div>
-
-      </div>
   </form>
 </body>
 
