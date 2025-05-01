@@ -128,7 +128,15 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
       <div class="side-nav">
         <div class="logo text-center">
           <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
-        </div>
+          </div>
+          <a class="nav-link" href="qa_coordinator_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a class="nav-link" href="qa_coordinator_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
+            <a class="nav-link" href="qa_coordinator_idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <a class="nav-link-active" href="qa_coordinator_annoucement.php"><i class="fa-regular fa-lightbulb"></i> Announcements</a>
+           
+            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+        <!-- </div> -->
+  </div>
         <div class="dash-section">
           <header class="dash-header">
             <div class="search-input">
