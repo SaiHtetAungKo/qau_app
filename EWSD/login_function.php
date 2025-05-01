@@ -24,6 +24,10 @@ $query = mysqli_query($connection, $select);
 $data = mysqli_fetch_array($query);
 
 if ($data) {
+    if ($data['account_status'] === 'deactivate') {
+        header("location: index.php?error=deactivated&email=" . urlencode($email));
+        exit();
+    }
     $userID = $data['user_id'];
     $userEmail = $data['user_email'];
     $userName = $data['user_name'];
