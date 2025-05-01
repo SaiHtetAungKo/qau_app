@@ -55,37 +55,133 @@ if (isset($_GET['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Staff</title>
 </head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        padding: 25px 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+    }
+
+    .form-container h2 {
+        margin-bottom: 20px;
+        color: #333;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 570px;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .form-group select {
+        width: 600px;
+    }
+
+    .form-group input[type="file"] {
+        padding: 6px;
+        width: 585px;
+    }
+
+    .form-group img {
+
+        width: 100px;
+        border-radius: 6px;
+    }
+
+    .form-actions {
+        text-align: center;
+    }
+
+    .form-actions button {
+        background: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .form-actions button:hover {
+        background: #0056b3;
+    }
+</style>
 
 <body>
-    <h2>Edit Staff</h2>
-    <form method="POST" enctype="multipart/form-data">
-        <label for="user_name">Name:</label>
-        <input type="text" name="user_name" value="<?php echo htmlspecialchars($staff['user_name']); ?>" required><br><br>
+    <div class="form-container">
+        <h2>Edit Staff</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <div style="display: flex;
+        justify-content: center; margin-bottom:1rem;">
+                    <?php if ($staff['user_profile']) : ?>
+                        <img src="<?php echo htmlspecialchars($staff['user_profile']); ?>" alt="Current Profile">
+                    <?php endif; ?>
+                </div>
+                <label for="user_profile">Profile Picture</label>
+                <input type="file" name="user_profile">
 
-        <label for="user_email">Email:</label>
-        <input type="email" name="user_email" value="<?php echo htmlspecialchars($staff['user_email']); ?>" required><br><br>
+            </div>
+            <div class="form-group">
+                <label for="user_name">Name</label>
+                <input type="text" name="user_name" value="<?php echo htmlspecialchars($staff['user_name']); ?>" required>
+            </div>
 
-        <label for="user_phone">Phone:</label>
-        <input type="text" name="user_phone" value="<?php echo htmlspecialchars($staff['user_phone']); ?>" required><br><br>
+            <div class="form-group">
+                <label for="user_email">Email</label>
+                <input type="email" name="user_email" value="<?php echo htmlspecialchars($staff['user_email']); ?>" required>
+            </div>
 
-        <label for="department_id">Department:</label>
-        <select name="department_id" required>
-            <option value="">Select Department</option>
-            <?php
-            // Fetch departments
-            $department_sql = "SELECT * FROM departments";
-            $department_result = mysqli_query($connection, $department_sql);
-            while ($department = mysqli_fetch_assoc($department_result)) {
-                echo "<option value='" . $department['department_id'] . "' " . ($staff['department_id'] == $department['department_id'] ? 'selected' : '') . ">" . htmlspecialchars($department['department_name']) . "</option>";
-            }
-            ?>
-        </select><br><br>
+            <div class="form-group">
+                <label for="user_phone">Phone</label>
+                <input type="text" name="user_phone" value="<?php echo htmlspecialchars($staff['user_phone']); ?>" required>
+            </div>
 
-        <label for="user_profile">Profile Picture:</label>
-        <input type="file" name="user_profile"><br><br>
+            <div class="form-group">
+                <label for="department_id">Department</label>
+                <select name="department_id" required>
+                    <option value="">Select Department</option>
+                    <?php
+                    $department_sql = "SELECT * FROM departments";
+                    $department_result = mysqli_query($connection, $department_sql);
+                    while ($department = mysqli_fetch_assoc($department_result)) {
+                        $selected = $staff['department_id'] == $department['department_id'] ? 'selected' : '';
+                        echo "<option value='{$department['department_id']}' $selected>" . htmlspecialchars($department['department_name']) . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
 
-        <button type="submit" name="update">Update Staff</button>
-    </form>
+
+
+            <div class="form-actions">
+                <button type="submit" name="update"><i class="fa-solid fa-floppy-disk"></i> Update Staff</button>
+            </div>
+        </form>
+    </div>
 </body>
 
 </html>

@@ -36,15 +36,16 @@ $result = $connection->query($query);
     <div class="admin-container">
         <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link" href="admin_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link" href="staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
             <a class="nav-link" href="request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
             <a class="nav-link-active" href="idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
-            <a class="nav-link" href="register.php"><b>User Registration</b></a>
-            <a class="nav-link" href="change_password.php"><b>Change Password</b></a>
-            <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+            <a class="nav-link" href="register.php">User Registration</a>
+            <a class="nav-link" href="change_password.php">Change Password</a>
+            <a class="nav-link" href="department.php">Department</a>
+            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
         <div class="dash-section">
             <header class="dash-header">

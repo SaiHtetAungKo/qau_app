@@ -1,8 +1,8 @@
 <?php
 session_start();
 include('connection.php');
-$connect = new Connect(); 
-$connection = $connect->getConnection(); 
+$connect = new Connect();
+$connection = $connect->getConnection();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user'])) {
@@ -77,6 +77,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Idea by Department</title>
@@ -84,7 +85,11 @@ while ($row = mysqli_fetch_assoc($topResult)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-         body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
         .container {
             max-width: 900px;
@@ -106,20 +111,45 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             margin-bottom: 20px;
             text-decoration: none;
         }
-        .logout { margin-top: auto; background: #3c9a72; padding: 12px; color: white; border: none; width: 100%; border-radius: 10px; cursor: pointer; font-size: 16px; }
-        .logout:hover { background: rgb(89, 64, 122); }
 
-        
+        .logout {
+            margin-top: auto;
+            background: #3c9a72;
+            padding: 12px;
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout:hover {
+            background: rgb(89, 64, 122);
+        }
+
+
         /* for successful disable staff acc msg */
-   
+
 
         @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
         }
-        
+
         h2 {
             font-size: 24px;
             margin-bottom: 20px;
@@ -170,7 +200,14 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             font-size: 14px;
             margin: 0;
         }
-        .content { flex: 1; background: rgb(89, 64, 122); color: white; padding: 20px; overflow-y: auto; }
+
+        .content {
+            flex: 1;
+            background: rgb(89, 64, 122);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
 
         .subcategory {
             background-color: #A3E7D8;
@@ -185,7 +222,15 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             font-size: 14px;
             line-height: 1.6;
         }
-        .green-box { width: 40px; height: 40px; background-color: #90d5c9; border-radius: 12px; margin-bottom: 10px; }
+
+        .green-box {
+            width: 40px;
+            height: 40px;
+            background-color: #90d5c9;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
         .reactions {
             display: flex;
             gap: 15px;
@@ -203,6 +248,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             gap: 8px;
             cursor: pointer;
         }
+
         .reactions a {
             padding: 10px 20px;
             border: 2px solid #ccc;
@@ -215,15 +261,16 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             gap: 8px;
             cursor: pointer;
         }
+
         .reactions .hide-idea-btn {
-            margin-left: auto;  
-            background-color: #59417B; 
-            border-color: #59417B;  
+            margin-left: auto;
+            background-color: #59417B;
+            border-color: #59417B;
             color: white;
         }
 
         .reactions .hide-idea-btn:hover {
-            background-color:rgb(124, 91, 170);
+            background-color: rgb(124, 91, 170);
             border-color: rgb(124, 91, 170);
         }
 
@@ -253,12 +300,13 @@ while ($row = mysqli_fetch_assoc($topResult)) {
         }
     </style>
 </head>
+
 <body>
 
-<div class="admin-container">
-    <div class="side-nav">
+    <div class="admin-container">
+        <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link
             " href="qa_manager_dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
@@ -267,108 +315,107 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             <a class="nav-link" href="qa_manager_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
             <a class="nav-link" href="qa_manager_hidden_idea_list.php"><i class="fa-regular fa-eye-slash"></i> Hidden Idea List</a>
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
-    </div>
-    <main class="content">
-    <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a>
-    <h2>Idea by <span>Department</span></h2>
-    <?php foreach ($ideas as $idea): ?>
-    <div class="card">
-        <div class="user-info">
-            <div class="user-left">
-                <div class="avatar">👤</div>
-                <div>
-                    <p class="dept-name"><?= htmlspecialchars($idea['department_name']) ?></p>
-                    <p class="date"><?= date("d.m.Y", strtotime($idea['idea_created_at'])) ?></p>
+        </div>
+        <main class="content">
+            <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a>
+            <h2>Idea by <span>Department</span></h2>
+            <?php foreach ($ideas as $idea): ?>
+                <div class="card">
+                    <div class="user-info">
+                        <div class="user-left">
+                            <div class="avatar">👤</div>
+                            <div>
+                                <p class="dept-name"><?= htmlspecialchars($idea['department_name']) ?></p>
+                                <p class="date"><?= date("d.m.Y", strtotime($idea['idea_created_at'])) ?></p>
+                            </div>
+                        </div>
+                        <span class="subcategory"><?= htmlspecialchars($idea['SubCategoryTitle']) ?></span>
+                    </div>
+
+                    <p class="idea-text"><?= htmlspecialchars($idea['idea_description']) ?></p>
+
+
+                    <div class="reactions">
+                        <button><?= $idea['upvotes'] ?> 👍</button>
+                        <button><?= $idea['downvotes'] ?> 👎</button>
+                        <button onclick="openModal(<?= $idea['idea_id'] ?>)"><?= $idea['comment_count'] ?> 💬</button>
+
+                        <?php
+
+                        $idea_status = $idea['idea_status']; // 'active' or 'hide'
+
+                        if ($idea_status == 'hide') {
+                            // Show Unhide button
+                            echo '<a href="hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Unhide</a>';
+                        } else {
+                            // Show Hide button
+                            echo '<a href="hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Hide</a>';
+                        }
+                        ?>
+                    </div>
+
+                </div>
+            <?php endforeach; ?>
+            <!-- MODAL -->
+            <!-- MODAL -->
+            <div id="commentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; font-family:'Poppins', sans-serif;">
+                <div style="background:white; width:600px; max-width:90%; border-radius:10px; overflow:hidden;">
+                    <div style="background:#1e1e1e; padding:20px; color:white;">
+                        <h3 style="margin:0; font-size:18px;">Comments</h3>
+                    </div>
+                    <div style="padding: 20px; max-height: 400px; overflow-y: auto;" id="commentContent">
+                        <!-- Comments will be injected here -->
+                    </div>
+                    <div style="border-top: 1px solid #ccc; display: flex; align-items: center; padding: 20px; gap: 10px;">
+                        <input type="text" placeholder="Leave your thoughts here" style="flex:1; padding: 14px; border: 1px solid #999; border-radius: 8px; font-family: 'Poppins', sans-serif;">
+                        <button style="border: none; background: none; font-size: 24px; cursor: pointer;">📤</button>
+                    </div>
+                    <div style="text-align:right; padding: 10px 20px;">
+                        <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
+                    </div>
                 </div>
             </div>
-            <span class="subcategory"><?= htmlspecialchars($idea['SubCategoryTitle']) ?></span>
-        </div>
+            <div class="footer-section">
+                <p class="note">You can download only after final closure date</p>
+                <button class="download-btn">⬇️ Download</button>
+            </div>
+        </main>
 
-        <p class="idea-text"><?= htmlspecialchars($idea['idea_description']) ?></p>
-        
-  
-        <div class="reactions">
-            <button><?= $idea['upvotes'] ?> 👍</button>
-            <button><?= $idea['downvotes'] ?> 👎</button>
-            <button onclick="openModal(<?= $idea['idea_id'] ?>)"><?= $idea['comment_count'] ?> 💬</button>
+    </div>
 
-            <?php
-            
-                $idea_status = $idea['idea_status']; // 'active' or 'hide'
 
-                if ($idea_status == 'hide') {
-                    // Show Unhide button
-                    echo '<a href="hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Unhide</a>';
-                } else {
-                    // Show Hide button
-                    echo '<a href="hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Hide</a>';
+    <!-- JS for modal -->
+    <script>
+        const ideaData = <?= json_encode($ideas) ?>;
+
+        function openModal(ideaId) {
+            const idea = ideaData.find(i => i.idea_id == ideaId);
+            const comments = idea.comment_texts?.split('||') || [];
+            const dates = idea.comment_dates?.split('||') || [];
+
+            // Filter out duplicates based on comment + date combo
+            const seen = new Set();
+            const uniqueComments = [];
+            const uniqueDates = [];
+
+            comments.forEach((comment, index) => {
+                const key = comment.trim() + dates[index]?.trim();
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    uniqueComments.push(comment);
+                    uniqueDates.push(dates[index]);
                 }
-            ?>
-        </div>
+            });
 
-    </div>
-<?php endforeach; ?>
-<!-- MODAL -->
-<!-- MODAL -->
-<div id="commentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; font-family:'Poppins', sans-serif;">
-    <div style="background:white; width:600px; max-width:90%; border-radius:10px; overflow:hidden;">
-        <div style="background:#1e1e1e; padding:20px; color:white;">
-            <h3 style="margin:0; font-size:18px;">Comments</h3>
-        </div>
-        <div style="padding: 20px; max-height: 400px; overflow-y: auto;" id="commentContent">
-            <!-- Comments will be injected here -->
-        </div>
-        <div style="border-top: 1px solid #ccc; display: flex; align-items: center; padding: 20px; gap: 10px;">
-            <input type="text" placeholder="Leave your thoughts here" style="flex:1; padding: 14px; border: 1px solid #999; border-radius: 8px; font-family: 'Poppins', sans-serif;">
-            <button style="border: none; background: none; font-size: 24px; cursor: pointer;">📤</button>
-        </div>
-        <div style="text-align:right; padding: 10px 20px;">
-            <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
-        </div>
-    </div>
-</div>
-<div class="footer-section">
-        <p class="note">You can download only after final closure date</p>
-        <button class="download-btn">⬇️ Download</button>
-    </div>
-    </main>
-    
-</div>
-
-
-<!-- JS for modal -->
-<script>
-
-    const ideaData = <?= json_encode($ideas) ?>;
-
-    function openModal(ideaId) {
-        const idea = ideaData.find(i => i.idea_id == ideaId);
-        const comments = idea.comment_texts?.split('||') || [];
-        const dates = idea.comment_dates?.split('||') || [];
-
-        // Filter out duplicates based on comment + date combo
-        const seen = new Set();
-        const uniqueComments = [];
-        const uniqueDates = [];
-
-        comments.forEach((comment, index) => {
-            const key = comment.trim() + dates[index]?.trim();
-            if (!seen.has(key)) {
-                seen.add(key);
-                uniqueComments.push(comment);
-                uniqueDates.push(dates[index]);
-            }
-        });
-
-        // Start building HTML
-        let html = `
+            // Start building HTML
+            let html = `
             <h2 style="margin: 0 0 10px 0; color: black;">Comments</h2>
             <hr>
             <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
         `;
 
-        uniqueComments.forEach((text, idx) => {
-            html += `
+            uniqueComments.forEach((text, idx) => {
+                html += `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 0;">
                     <div style="display: flex; gap: 15px;">
                         <div style="width: 50px; height: 50px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">👤</div>
@@ -380,20 +427,20 @@ while ($row = mysqli_fetch_assoc($topResult)) {
                     <p style="color: #666; font-size: 14px;">${new Date(uniqueDates[idx]).toLocaleDateString()}</p>
                 </div>
             `;
-        });
+            });
 
-        html += `</div>`; // close scrollable div
+            html += `</div>`; // close scrollable div
 
-        document.getElementById('commentContent').innerHTML = html;
-        document.getElementById('commentModal').style.display = 'flex';
-    }
+            document.getElementById('commentContent').innerHTML = html;
+            document.getElementById('commentModal').style.display = 'flex';
+        }
 
 
-    function closeModal() {
-        document.getElementById('commentModal').style.display = 'none';
-    }
-
-</script>
+        function closeModal() {
+            document.getElementById('commentModal').style.display = 'none';
+        }
+    </script>
 
 </body>
+
 </html>
