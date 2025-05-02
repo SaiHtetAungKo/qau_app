@@ -1,8 +1,8 @@
 <?php
 session_start();
 include('connection.php');
-$connect = new Connect(); 
-$connection = $connect->getConnection(); 
+$connect = new Connect();
+$connection = $connect->getConnection();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user'])) {
@@ -78,6 +78,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Idea by Department</title>
@@ -85,7 +86,11 @@ while ($row = mysqli_fetch_assoc($topResult)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-         body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
         .container {
             max-width: 900px;
@@ -107,20 +112,45 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             margin-bottom: 20px;
             text-decoration: none;
         }
-        .logout { margin-top: auto; background: #3c9a72; padding: 12px; color: white; border: none; width: 100%; border-radius: 10px; cursor: pointer; font-size: 16px; }
-        .logout:hover { background: rgb(89, 64, 122); }
 
-        
+        .logout {
+            margin-top: auto;
+            background: #3c9a72;
+            padding: 12px;
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout:hover {
+            background: rgb(89, 64, 122);
+        }
+
+
         /* for successful disable staff acc msg */
-   
+
 
         @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
         }
-        
+
         h2 {
             font-size: 24px;
             margin-bottom: 20px;
@@ -183,7 +213,14 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             font-size: 14px;
             margin: 0;
         }
-        .content { flex: 1; background: rgb(89, 64, 122); color: white; padding: 20px; overflow-y: auto; }
+
+        .content {
+            flex: 1;
+            background: rgb(89, 64, 122);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
 
         .subcategory {
             background-color: #A3E7D8;
@@ -198,7 +235,15 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             font-size: 14px;
             line-height: 1.6;
         }
-        .green-box { width: 40px; height: 40px; background-color: #90d5c9; border-radius: 12px; margin-bottom: 10px; }
+
+        .green-box {
+            width: 40px;
+            height: 40px;
+            background-color: #90d5c9;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
         .reactions {
             display: flex;
             gap: 15px;
@@ -216,6 +261,7 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             gap: 8px;
             cursor: pointer;
         }
+
         .reactions a {
             padding: 10px 20px;
             border: 2px solid #ccc;
@@ -228,15 +274,16 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             gap: 8px;
             cursor: pointer;
         }
+
         .reactions .hide-idea-btn {
-            margin-left: auto;  
-            background-color: #59417B; 
-            border-color: #59417B;  
+            margin-left: auto;
+            background-color: #59417B;
+            border-color: #59417B;
             color: white;
         }
 
         .reactions .hide-idea-btn:hover {
-            background-color:rgb(124, 91, 170);
+            background-color: rgb(124, 91, 170);
             border-color: rgb(124, 91, 170);
         }
         .no-ideas-message {
@@ -276,12 +323,13 @@ while ($row = mysqli_fetch_assoc($topResult)) {
         }
     </style>
 </head>
+
 <body>
 
-<div class="admin-container">
-    <div class="side-nav">
+    <div class="admin-container">
+        <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link
             " href="qa_manager_dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
@@ -411,20 +459,20 @@ while ($row = mysqli_fetch_assoc($topResult)) {
                     <p style="color: #666; font-size: 14px;">${new Date(uniqueDates[idx]).toLocaleDateString()}</p>
                 </div>
             `;
-        });
+            });
 
-        html += `</div>`; // close scrollable div
+            html += `</div>`; // close scrollable div
 
-        document.getElementById('commentContent').innerHTML = html;
-        document.getElementById('commentModal').style.display = 'flex';
-    }
+            document.getElementById('commentContent').innerHTML = html;
+            document.getElementById('commentModal').style.display = 'flex';
+        }
 
 
-    function closeModal() {
-        document.getElementById('commentModal').style.display = 'none';
-    }
-
-</script>
+        function closeModal() {
+            document.getElementById('commentModal').style.display = 'none';
+        }
+    </script>
 
 </body>
+
 </html>

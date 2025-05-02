@@ -1,8 +1,8 @@
 <?php
 session_start();
 include('connection.php');
-$connect = new Connect(); 
-$connection = $connect->getConnection(); 
+$connect = new Connect();
+$connection = $connect->getConnection();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user'])) {
@@ -86,6 +86,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>QA Manager Category and Idea Report</title>
@@ -94,40 +95,186 @@ while ($row = mysqli_fetch_assoc($result)) {
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-        .container { display: flex; height: 100vh; }
-        .sidebar { width: 250px; background: white; color: black; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .sidebar h2 { margin-bottom: 20px; }
-        .btn { width: 100%; padding: 12px; margin: 10px 0; background: #ddd; border: none; color: black; cursor: pointer; text-align: center; font-size: 16px; border-radius: 10px; transition: 0.3s; }
-        .btn:hover { background: rgb(89, 64, 122); color: white; }
-        .logout { margin-top: auto; background: #3c9a72; padding: 12px; color: white; border: none; width: 100%; border-radius: 10px; cursor: pointer; font-size: 16px; }
-        .logout:hover { background: rgb(89, 64, 122); }
-        .content { flex: 1; background: rgb(89, 64, 122); color: white; padding: 20px; overflow-y: auto; }
-        header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
-        input[type="text"] { padding: 12px; width: 50%; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; }
-        .user-info { text-align: right; margin-right: 21px; }
-        header a { color: white; text-decoration: underline; }
-        .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .category-card { background: white; color: black; padding: 30px 20px; border-radius: 10px; position: relative; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
-        .category-image { width: 40px; height: 40px; border-radius: 5px; margin-bottom: 10px; }
-        .arrow, .delete { position: absolute; right: 15px; bottom: 15px; font-size: 20px; cursor: pointer; }
-        .delete { color: red; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            color: black;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #ddd;
+            border: none;
+            color: black;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: rgb(89, 64, 122);
+            color: white;
+        }
+
+        .logout {
+            margin-top: auto;
+            background: #3c9a72;
+            padding: 12px;
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout:hover {
+            background: rgb(89, 64, 122);
+        }
+
+        .content {
+            flex: 1;
+            background: rgb(89, 64, 122);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            width: 50%;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .user-info {
+            text-align: right;
+            margin-right: 21px;
+        }
+
+        header a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: white;
+            color: black;
+            padding: 30px 20px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .arrow,
+        .delete {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .delete {
+            color: red;
+        }
+
         /* Section visibility */
-        #category-sections, #idea-report-section { display: none; }
+        #category-sections,
+        #idea-report-section {
+            display: none;
+        }
+
         /* Download section */
-        .download-section { margin-top: 40px; display: flex; justify-content: space-between; align-items: center; }
-        .download-section p { font-weight: bold; }
-        .download-btn { background: #aee0d3; padding: 12px 20px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .green-box { width: 40px; height: 40px; background-color: #90d5c9; border-radius: 12px; margin-bottom: 10px; }
+        .download-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-section p {
+            font-weight: bold;
+        }
+
+        .download-btn {
+            background: #aee0d3;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .green-box {
+            width: 40px;
+            height: 40px;
+            background-color: #90d5c9;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="admin-container">
-<div class="side-nav">
+    <div class="admin-container">
+        <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link" href="qa_manager_dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-layer-group"></i> Categories</a>
@@ -179,15 +326,15 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <?php foreach ($topCategories as $cat) { ?>
                         <div class="category-card">
                             <img src="images/dummy_category.png" alt="" class="category-image">
-                            <h4>                           
+                            <h4>
                                 <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
                             </h4>
-                            <h4>               
+                            <h4>
                                 <?php echo htmlspecialchars($cat['SubCategoryTitle']); ?>
                             </h4>
                             <p>Total Ideas: <?php echo $cat['idea_count']; ?></p>
                             <a href="qa_manager_idea_list.php?category_name=<?php echo urlencode($cat['MainCategoryTitle']); ?>">
-                            <span class="arrow">&rarr;</span>
+                                <span class="arrow">&rarr;</span>
                             </a>
                         </div>
                     <?php } ?>
@@ -199,13 +346,13 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <div class="category-card unused">
                             <img src="images/dummy_category.png" alt="" class="category-image">
                             <h4>
-        <a href="qa_manager_idea_list.php?category_id=<?php echo $cat['MainCategoryID']; ?>">
-            <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
-        </a>
-    </h4>
-    <h4>               
-    <?php echo htmlspecialchars($cat['SubCategoryTitle']); ?>
-    </h4>
+                                <a href="qa_manager_idea_list.php?category_id=<?php echo $cat['MainCategoryID']; ?>">
+                                    <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
+                                </a>
+                            </h4>
+                            <h4>
+                                <?php echo htmlspecialchars($cat['SubCategoryTitle']); ?>
+                            </h4>
                             <!-- <p>No ideas submitted</p> -->
                             <span class="delete" data-category-id="<?php echo $cat['MainCategoryID']; ?>">&#128465;</span>
 
@@ -242,8 +389,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 </div> -->
 
 
-            </div>
-        </main>
+    </div>
+    </main>
     </div>
 
     <script>
@@ -292,7 +439,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                 window.location.href = 'logout.php';
             }
         }
+        
     </script>
-</div>
+    </div>
 </body>
+
 </html>

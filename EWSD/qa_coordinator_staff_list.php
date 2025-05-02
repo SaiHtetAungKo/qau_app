@@ -33,7 +33,7 @@ $query = "
     FROM users u
     INNER JOIN roles r ON u.role_id = r.role_id
     INNER JOIN departments d ON u.department_id = d.department_id
-    WHERE r.role_type = 'QA coordinator ' AND u.department_id = ?
+    WHERE r.role_type = 'staff' AND u.department_id = ?
 ";
 $stmt = $connection->prepare($query);
 $stmt->bind_param('i', $userDepartmentId);
@@ -56,13 +56,14 @@ $result = $stmt->get_result();
     <div class="admin-container">
         <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link" href="qa_coordinator_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link-active" href="qa_coordinator_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
-            <a class="nav-link" href="qa_coordinator_request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
             <a class="nav-link" href="qa_coordinator_idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
-            <a class="nav-link" href="qa_coordinator_annoucement.php"><i class="fa-regular fa-lightbulb"></i> Annoucement</a> 
+            <!-- <a class="nav-link" href="qa_coordinator_request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a> -->
+            <!-- <a class="nav-link" href="qa_coordinator_idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a> -->
+            <a class="nav-link" href="qa_coordinator_annoucement.php"><i class="fa-regular fa-lightbulb"></i> Annoucement</a>
             <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
         <div class="dash-section">
@@ -102,7 +103,7 @@ $result = $stmt->get_result();
                                     <td><?php echo htmlspecialchars($row['department_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['created_at']); ?></td>
                                     <td>
-                                        <a href="edit_staff.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
+                                        <a href="editstaff.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
                                         <a href="delete_staff.php?id=<?php echo $row['user_id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
                                     </td>
                                 </tr>

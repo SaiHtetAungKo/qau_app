@@ -4,36 +4,97 @@ include('connection.php');
 $connect = new Connect();
 $connection = $connect->getConnection();
 
-if (!isset($_SESSION['userID'])) {
-    echo "<script>
-        alert('Please Login First');
-        window.location = 'index.php';
-    </script>";
-    exit();
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    echo "<script> window.alert('Please Login First'); </script>";
+    echo "<script> window.location= 'index.php'; </script>";
+    exit(); // Stop further code execution
+}
+$userID = $_SESSION['userID'];
+// 1. Top 3 Popular Categories
+$topQuery = "SELECT 
+                mc.MainCategoryID,
+                mc.MainCategoryTitle,
+                COUNT(i.idea_id) AS idea_count
+             FROM ideas i
+             JOIN subcategory sc ON i.SubCategoryID = sc.SubCategoryID
+             JOIN maincategory mc ON sc.MainCategoryID = mc.MainCategoryID
+             GROUP BY mc.MainCategoryID, mc.MainCategoryTitle
+             ORDER BY idea_count DESC
+             LIMIT 3";
+
+$topResult = mysqli_query($connection, $topQuery);
+$topCategories = [];
+while ($row = mysqli_fetch_assoc($topResult)) {
+    $topCategories[] = $row;
 }
 
-$userName = $_SESSION['userName'];
-$userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg';
+// 2. Unused Categories (No ideas at all)
+$unusedQuery = "SELECT 
+                   mc.MainCategoryID,
+                   mc.MainCategoryTitle
+                FROM maincategory mc
+                LEFT JOIN subcategory sc ON mc.MainCategoryID = sc.MainCategoryID
+                LEFT JOIN ideas i ON sc.SubCategoryID = i.SubCategoryID
+                WHERE i.idea_id IS NULL
+                GROUP BY mc.MainCategoryID, mc.MainCategoryTitle";
 
-// Fetch user's department ID
-$userID = $_SESSION['userID'];
-$userQuery = "SELECT department_id FROM users WHERE user_id = ?";
-$stmt = $connection->prepare($userQuery);
-$stmt->bind_param('i', $userID);
+$unusedResult = mysqli_query($connection, $unusedQuery);
+$unusedCategories = [];
+while ($row = mysqli_fetch_assoc($unusedResult)) {
+    $unusedCategories[] = $row;
+}
+// Get department ID from database
+$query7 = "SELECT department_id FROM users WHERE user_ID = ?";
+$stmt = $connection->prepare($query7);
+$stmt->bind_param("i", $userID);
 $stmt->execute();
-$userResult = $stmt->get_result();
-$userData = $userResult->fetch_assoc();
-$userDepartmentId = $userData['department_id'];
+$result6 = $stmt->get_result();
 
-// Fetch request ideas for user's department
-$query = "SELECT requestIdea_id, title, description, closure_date, final_closure_date 
-          FROM request_ideas 
-          WHERE department_id = ?
-          ORDER BY closure_date DESC";
-$stmt = $connection->prepare($query);
-$stmt->bind_param('i', $userDepartmentId);
-$stmt->execute();
-$result = $stmt->get_result();
+if ($row = $result6->fetch_assoc()) {
+  $departmentID = $row['department_id'];
+  // You can now use $departmentID anywhere on this page
+} else {
+  // Handle error if no department found
+  echo "<script>alert('User department not found');</script>";
+}
+// New SQL query to fetch department idea data with contribution percentage
+$query = "
+WITH department_idea_data AS (
+  SELECT 
+    d.department_id AS department_id,
+    d.department_name AS department_name,
+    COUNT(i.idea_id) AS total_ideas,
+    COUNT(DISTINCT u.user_id) AS total_posters
+  FROM departments d
+   
+  LEFT JOIN users u ON u.department_id = d.department_id
+  LEFT JOIN ideas i ON i.userID = u.user_id
+WHERE 
+        d.department_id = '$departmentID'
+  GROUP BY d.department_id, d.department_name
+),
+total_idea_count AS (
+  SELECT COUNT(*) AS total_ideas FROM ideas
+)
+SELECT 
+  did.department_id,
+  did.department_name,
+  did.total_ideas,
+  did.total_posters,
+  ROUND(CAST(did.total_ideas AS FLOAT) / tic.total_ideas * 100, 2) AS contribution_percentage
+FROM department_idea_data did
+CROSS JOIN total_idea_count tic
+ORDER BY did.total_ideas DESC;
+";
+
+$result = mysqli_query($connection, $query);
+$departments = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $departments[] = $row;
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -41,88 +102,301 @@ $result = $stmt->get_result();
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>QA Manager Category and Idea Report</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <title>Idea Reports | Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            color: black;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #ddd;
+            border: none;
+            color: black;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: rgb(89, 64, 122);
+            color: white;
+        }
+
+        .logout {
+            margin-top: auto;
+            background: #3c9a72;
+            padding: 12px;
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout:hover {
+            background: rgb(89, 64, 122);
+        }
+
+        .content {
+            flex: 1;
+            background: rgb(89, 64, 122);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            width: 50%;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .user-info {
+            text-align: right;
+            margin-right: 21px;
+        }
+
+        header a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: white;
+            color: black;
+            padding: 30px 20px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .arrow,
+        .delete {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .delete {
+            color: red;
+        }
+
+        /* Section visibility */
+        #category-sections,
+        #idea-report-section {
+            display: block;
+        }
+
+        /* Download section */
+        .download-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-section p {
+            font-weight: bold;
+        }
+
+        .download-btn {
+            background: #aee0d3;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .green-box {
+            width: 40px;
+            height: 40px;
+            background-color: #90d5c9;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 
 <body>
+
     <div class="admin-container">
         <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link" href="qa_coordinator_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link" href="qa_coordinator_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
-            <a class="nav-link" href="qa_coordinator_request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
             <a class="nav-link-active" href="qa_coordinator_idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
-            <a class="nav-link" href="qa_coordinator_annoucement.php"><i class="fa-regular fa-lightbulb"></i> Annoucement</a> 
-            <!-- <a class="nav-link" href="register.php"><b>User Registration</b></a>
-            <a class="nav-link" href="change_password.php"><b>Change Password</b></a> -->
-            <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+            <a class="nav-link" href="qa_coordinator_annoucement.php"><i class="fa-regular fa-lightbulb"></i> Announcements</a>
+            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
-        <div class="dash-section">
-            <header class="dash-header">
-                <div class="search-input">
-                    <input type="search" placeholder="Search" aria-label="Search">
-                </div>
-                <div class="user-display">
-                    <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
-                    <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
-                </div>
-            </header>
-            <h6 class="dash-title">Idea Reports</h6>
-            <div class="list-form">
-                <?php while ($row = $result->fetch_assoc()): ?>
-                    <div class="idea-list-form">
-                        <div class="idea-box">
-                            <div class="flex-box">
-                                <span class="request-idea-title"><?php echo htmlspecialchars($row['title']); ?></span>
-                                <span class="desc"><?php echo htmlspecialchars($row['description']); ?></span>
-                            </div>
-                            <div class="flex-box-1">
-                                <span>Closure Date - <?php echo $row['closure_date']; ?></span>
-                                <span>Final Closure Date - <?php echo $row['final_closure_date']; ?></span>
-                            </div>
-                        </div>
-                        <!-- Fetch ideas related to this request -->
-                        <?php
-                        $requestIdea_id = $row['requestIdea_id'];
-                        $ideasQuery = "SELECT title, description, anonymousSubmission FROM ideas WHERE requestIdea_id = ?";
-                        $stmt = $connection->prepare($ideasQuery);
-                        $stmt->bind_param("i", $requestIdea_id);
-                        $stmt->execute();
-                        $ideasResult = $stmt->get_result();
-                        ?>
 
-                        <div class="ideas-list">
-                            <strong>Submitted Ideas:</strong>
-                            <?php if ($ideasResult->num_rows > 0): ?>
-                                <ul>
-                                    <?php while ($idea = $ideasResult->fetch_assoc()): ?>
-                                        <li>
-                                            <strong><?php echo htmlspecialchars($idea['title']); ?></strong> -
-                                            <?php echo htmlspecialchars($idea['description']); ?>
-                                            <?php if ($idea['anonymousSubmission']): ?>
-                                                <span class="anonymous-tag">(Anonymous Submission)</span>
-                                            <?php endif; ?>
-                                        </li>
-                                    <?php endwhile; ?>
-                                </ul>
-                            <?php else: ?>
-                                <div class="no-list">
-                                    <img src="Images/no-list.png" alt="No-List">
-                                    <h3>There is no ideas submitted yet!</h3>
-                                </div>
-                            <?php endif; ?>
+        <main class="content">
+            <header>
+                <input type="text" placeholder="Search">
+                <div class="user-info">
+                    <span><strong>Name</strong></span><br>
+                    <span>QA Coordinator</span>
+                </div>
+                <!-- <a href="add_category.php">Add new category</a> -->
+            </header>
+
+            <!-- Category Section
+            <div id="category-sections" style="display: block;">
+                <h3>🔥 Top 3 Popular Categories</h3>
+                <div class="categories">
+                    <?php foreach ($topCategories as $cat) { ?>
+                        <div class="category-card">
+                            <img src="images/dummy_category.png" alt="" class="category-image">
+                            <h4>
+                            <a href="qa_manager_idea_list.php?category_name=<?php echo urlencode($cat['MainCategoryTitle']); ?>">
+    <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
+</a>
+
+    </h4>
+                            <p>Total Ideas: <?php echo $cat['idea_count']; ?></p>
+                            <span class="arrow">&rarr;</span>
                         </div>
-                    </div>
-                <?php endwhile; ?>
+                    <?php } ?>
+                </div>
+
+                <h3>🗑️ Unused Categories</h3>
+                <div class="categories">
+                    <?php foreach ($unusedCategories as $cat) { ?>
+                        <div class="category-card unused">
+                            <img src="images/dummy_category.png" alt="" class="category-image">
+                            <h4>
+        <a href="qa_manager_idea_list.php?category_id=<?php echo $cat['MainCategoryID']; ?>">
+            <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
+        </a>
+    </h4>
+                            <p>No ideas submitted</p>
+                            <span class="delete">&#128465;</span>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div> -->
+
+            <!-- Idea Report Section -->
+            <div id="idea-report-section">
+                <h2>Idea Reports by Each Department</h2>
+                <div class="categories">
+                    <?php foreach ($departments as $dept) { ?>
+                        <div class="category-card">
+                            <div class="green-box"></div>
+                            <h4><?php echo htmlspecialchars($dept['department_name']); ?></h4>
+                            <p>
+                                Total Number of ideas: <?php echo $dept['total_ideas']; ?><br>
+                                Number of posters: <?php echo $dept['total_posters']; ?><br>
+                                Contribution Percentage: <?php echo $dept['contribution_percentage']; ?>%
+                            </p>
+                            <a href="qa_coordinator_ideas_per_department.php?category_name=<?php echo urlencode($dept['department_name']); ?>">
+                                <span class="arrow">&rarr;</span>
+                            </a>
+                        </div>
+                    <?php } ?>
+                </div>
+
+                <!-- <div class="download-section">
+                    <p>You can download only after final closure date</p>
+
+
+                    <form method="POST" action="download_csv.php">
+                        <button type="submit" name="download_csv" class="download-btn">&#8681; Download</button>
+                    </form>
+                </div> -->
+
+
             </div>
-        </div>
+        </main>
     </div>
+
+    <script>
+        function toggleCategories() {
+            document.getElementById("category-sections").style.display = "block";
+            document.getElementById("idea-report-section").style.display = "none";
+        }
+
+        function toggleIdeaReports() {
+            document.getElementById("category-sections").style.display = "none";
+            document.getElementById("idea-report-section").style.display = "block";
+        }
+
+        function confirmLogout() {
+            if (confirm('Do You Want To Log Out?')) {
+                window.location.href = 'logout.php';
+            }
+        }
+    </script>
     </div>
+
+
+
 </body>
 
 </html>

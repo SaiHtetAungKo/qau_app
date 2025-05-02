@@ -1,15 +1,23 @@
 <?php
-    session_start();
-    include('connection.php');
-    $connect = new Connect(); 
-    $connection = $connect->getConnection(); 
+session_start();
+include('connection.php');
+$connect = new Connect();
+$connection = $connect->getConnection();
 
-    // Check if the user is logged in
-    if (!isset($_SESSION['user'])) {
-        echo "<script> window.alert('Please Login First'); </script>";
-        echo "<script> window.location= 'index.php'; </script>";
-        exit(); 
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    echo "<script> window.alert('Please Login First'); </script>";
+    echo "<script> window.location= 'index.php'; </script>";
+    exit();
+}
+
+if (isset($_GET['msg']) && $_GET['msg'] == 'status_changed') {
+    if (isset($_GET['status']) && $_GET['status'] == 'hide') {
+        echo "<div class='popup-message'>Idea has been successfully hidden</div>";
+    } elseif (isset($_GET['status']) && $_GET['status'] == 'active') {
+        echo "<div class='popup-message'>Idea has been successfully unhidden</div>";
     }
+}
 
     if (isset($_GET['msg']) && $_GET['msg'] == 'status_changed') {
         if (isset($_GET['status']) && $_GET['status'] == 'hide') {
@@ -51,16 +59,17 @@
     ";
 
 
-    $hiddenResult = mysqli_query($connection, $hiddenQuery);
-    $ideas = [];
-    while ($row = mysqli_fetch_assoc($hiddenResult)) {
-        $ideas[] = $row;
-    }
+$hiddenResult = mysqli_query($connection, $hiddenQuery);
+$ideas = [];
+while ($row = mysqli_fetch_assoc($hiddenResult)) {
+    $ideas[] = $row;
+}
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Idea by Department</title>
@@ -68,7 +77,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-         body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
         .container {
             max-width: 900px;
@@ -90,14 +103,28 @@
             margin-bottom: 20px;
             text-decoration: none;
         }
-        .logout { margin-top: auto; background: #3c9a72; padding: 12px; color: white; border: none; width: 100%; border-radius: 10px; cursor: pointer; font-size: 16px; }
-        .logout:hover { background: rgb(89, 64, 122); }
 
-        
+        .logout {
+            margin-top: auto;
+            background: #3c9a72;
+            padding: 12px;
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout:hover {
+            background: rgb(89, 64, 122);
+        }
+
+
         /* for successful disable staff acc msg */
         .popup-message {
             position: fixed;
-            top:10%;
+            top: 10%;
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: #3c9a72;
@@ -112,12 +139,23 @@
         }
 
         @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
         }
-        
+
         h2 {
             font-size: 24px;
             margin-bottom: 20px;
@@ -177,9 +215,16 @@
             color: gray;
             font-size: 14px;
             margin: 0;
-            padding-bottom: 5px; 
+            padding-bottom: 5px;
         }
-        .content { flex: 1; background: rgb(89, 64, 122); color: white; padding: 20px; overflow-y: auto; }
+
+        .content {
+            flex: 1;
+            background: rgb(89, 64, 122);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
 
         .subcategory {
             background-color: #A3E7D8;
@@ -194,7 +239,15 @@
             font-size: 14px;
             line-height: 1.6;
         }
-        .green-box { width: 40px; height: 40px; background-color: #90d5c9; border-radius: 12px; margin-bottom: 10px; }
+
+        .green-box {
+            width: 40px;
+            height: 40px;
+            background-color: #90d5c9;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
         .reactions {
             display: flex;
             gap: 15px;
@@ -212,6 +265,7 @@
             gap: 8px;
             cursor: pointer;
         }
+
         .reactions a {
             padding: 10px 20px;
             border: 2px solid #ccc;
@@ -224,15 +278,16 @@
             gap: 8px;
             cursor: pointer;
         }
+
         .reactions .hide-idea-btn {
-            margin-left: auto;  
-            background-color: #59417B; 
-            border-color: #59417B;  
+            margin-left: auto;
+            background-color: #59417B;
+            border-color: #59417B;
             color: white;
         }
 
         .reactions .hide-idea-btn:hover {
-            background-color:rgb(124, 91, 170);
+            background-color: rgb(124, 91, 170);
             border-color: rgb(124, 91, 170);
         }
 
@@ -260,25 +315,27 @@
             gap: 10px;
             cursor: pointer;
         }
+
         .no-ideas-message {
-            background-color: #f8d7da;  
-            color: #721c24;           
-            border: 1px solid #f5c6cb; 
-            padding: 10px 15px;        
-            border-radius: 5px;        
-            font-size: 16px;         
-            text-align: center;        
-            margin-top: 20px;        
-            font-weight: bold;   
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
+
 <body>
 
-<div class="admin-container">
-    <div class="side-nav">
+    <div class="admin-container">
+        <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link" href="qa_manager_dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link" href="qa_manager_home.php"><i class="fa-solid fa-layer-group"></i> Categories</a>
@@ -306,21 +363,75 @@
         <div class="no-ideas-message">
             Currently, there are no hidden ideas.
         </div>
-    <?php else: ?>
-        <!-- if there is hidden idea -->
-        <?php foreach ($ideas as $idea): ?>
-            <div class="card">
-                <div class="user-info">
-                    <div class="user-left">
-                        <div class="avatar">👤</div>
-                        
-                        <div>
-                            <p class="user-name"><?= htmlspecialchars($idea['user_name']) ?></p>
-                            <p class="dept-name"><?= htmlspecialchars($idea['department_name']) ?></p>
-                            <p class="date"><?= date("F j, Y", strtotime($idea['idea_created_at'])) ?></p>
+        <main class="content">
+            <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a>
+            <h2><span>Hidden Idea List</span></h2>
+
+            <!-- if no hidden ideas available, show msg -->
+            <?php if (empty($ideas)): ?>
+                <div class="no-ideas-message">
+                    Currently, there are no hidden ideas.
+                </div>
+            <?php else: ?>
+                <!-- if there is hidden idea -->
+                <?php foreach ($ideas as $idea): ?>
+                    <div class="card">
+                        <div class="user-info">
+                            <div class="user-left">
+                                <div class="avatar">👤</div>
+
+                                <div>
+                                    <p class="user-name"><?= htmlspecialchars($idea['user_name']) ?></p>
+                                    <p class="dept-name"><?= htmlspecialchars($idea['department_name']) ?></p>
+                                    <p class="date"><?= date("F j, Y", strtotime($idea['idea_created_at'])) ?></p>
+                                </div>
+                            </div>
+                            <span class="subcategory"><?= htmlspecialchars($idea['SubCategoryTitle']) ?></span>
+                        </div>
+
+                        <p class="idea-text">Good</p>
+
+
+                        <div class="reactions">
+                            <button><?= $idea['upvotes'] ?> 👍</button>
+                            <button><?= $idea['downvotes'] ?> 👎</button>
+                            <button onclick="openModal(<?= $idea['idea_id'] ?>)"><?= $idea['comment_count'] ?> 💬</button>
+
+                            <?php
+
+                            $idea_status = $idea['idea_status']; // 'active' or 'hide'
+
+                            if ($idea_status == 'hide') {
+                                // Show Unhide button
+                                echo '<a href="hidden_list_hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Unhide</a>';
+                            } else {
+                                // Show Hide button
+                                echo '<a href="hidden_list_hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Hide</a>';
+                            }
+                            ?>
+                        </div>
+
+                    </div>
+                <?php endforeach; ?>
+
+                <!-- MODAL -->
+                <!-- MODAL -->
+                <div id="commentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; font-family:'Poppins', sans-serif;">
+                    <div style="background:white; width:600px; max-width:90%; border-radius:10px; overflow:hidden;">
+                        <div style="background:#1e1e1e; padding:20px; color:white;">
+                            <h3 style="margin:0; font-size:18px;">Comments</h3>
+                        </div>
+                        <div style="padding: 20px; max-height: 400px; overflow-y: auto;" id="commentContent">
+                            <!-- Comments will be injected here -->
+                        </div>
+                        <div style="border-top: 1px solid #ccc; display: flex; align-items: center; padding: 20px; gap: 10px;">
+                            <input type="text" placeholder="Leave your thoughts here" style="flex:1; padding: 14px; border: 1px solid #999; border-radius: 8px; font-family: 'Poppins', sans-serif;">
+                            <button style="border: none; background: none; font-size: 24px; cursor: pointer;">📤</button>
+                        </div>
+                        <div style="text-align:right; padding: 10px 20px;">
+                            <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
                         </div>
                     </div>
-                    <span class="subcategory"><?= htmlspecialchars($idea['SubCategoryTitle']) ?></span>
                 </div>
 
                 <p class="idea-text"><?= htmlspecialchars($idea['idea_description']) ?></p>
@@ -344,9 +455,9 @@
                         }
                     ?>
                 </div>
+        </main>
 
-            </div>
-        <?php endforeach; ?>
+    </div>
 
         <!-- MODAL -->
         <!-- MODAL -->
@@ -375,7 +486,6 @@
     <?php endif; ?>
 <!-- JS for modal -->
 <script>
-
     const ideaData = <?= json_encode($ideas) ?>;
     console.log(ideaData);
     function openModal(ideaId) {
@@ -431,8 +541,8 @@
     function closeModal() {
         document.getElementById('commentModal').style.display = 'none';
     }
-
 </script>
 
 </body>
+
 </html>

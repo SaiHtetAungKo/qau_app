@@ -36,15 +36,16 @@ $result = $connection->query($query);
     <div class="admin-container">
         <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link" href="admin_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link" href="staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
             <a class="nav-link" href="request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
             <a class="nav-link-active" href="idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
-            <a class="nav-link" href="register.php"><b>User Registration</b></a>
-            <a class="nav-link" href="change_password.php"><b>Change Password</b></a>
-            <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+            <a class="nav-link" href="register.php">User Registration</a>
+            <a class="nav-link" href="change_password.php">Change Password</a>
+            <a class="nav-link" href="department.php">Department</a>
+            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
         <div class="dash-section">
             <header class="dash-header">
@@ -73,7 +74,21 @@ $result = $connection->query($query);
                         <!-- Fetch ideas related to this request -->
                         <?php
                         $requestIdea_id = $row['requestIdea_id'];
-                        $ideasQuery = "SELECT title, description, anonymousSubmission FROM ideas WHERE requestIdea_id = ?";
+
+                        $ideasQuery = "
+SELECT i.idea_id, i.title, i.description, i.anonymousSubmission, i.created_at,
+       u.user_name, d.department_name,
+       COALESCE(SUM(CASE WHEN iv.votetype = 1 THEN 1 ELSE 0 END), 0) AS likes,
+       COALESCE(SUM(CASE WHEN iv.votetype = 2 THEN 1 ELSE 0 END), 0) AS dislikes
+FROM ideas i
+LEFT JOIN users u ON i.userID = u.user_id
+LEFT JOIN departments d ON u.department_id = d.department_id
+LEFT JOIN idea_vote iv ON i.idea_id = iv.idea_id
+WHERE i.requestIdea_id = ?
+GROUP BY i.idea_id
+ORDER BY i.created_at ASC
+";
+
                         $stmt = $connection->prepare($ideasQuery);
                         $stmt->bind_param("i", $requestIdea_id);
                         $stmt->execute();
@@ -85,19 +100,41 @@ $result = $connection->query($query);
                             <?php if ($ideasResult->num_rows > 0): ?>
                                 <ul>
                                     <?php while ($idea = $ideasResult->fetch_assoc()): ?>
-                                        <li>
-                                            <strong><?php echo htmlspecialchars($idea['title']); ?></strong> -
-                                            <?php echo htmlspecialchars($idea['description']); ?>
-                                            <?php if ($idea['anonymousSubmission']): ?>
-                                                <span class="anonymous-tag">(Anonymous Submission)</span>
-                                            <?php endif; ?>
+                                        <li style="margin-bottom: 20px;">
+                                            <!-- Show poster name and department -->
+                                            <div>
+                                                <strong>Posted By:</strong>
+                                                <?php
+                                                if ($idea['anonymousSubmission']) {
+                                                    echo "Anonymous";
+                                                } else {
+                                                    echo htmlspecialchars($idea['user_name']) . " (" . htmlspecialchars($idea['department_name']) . ")";
+                                                }
+                                                ?>
+                                            </div>
+
+                                            <!-- Show title and description -->
+                                            <div>
+                                                <strong>Title:</strong> <?php echo htmlspecialchars($idea['title']); ?>
+                                            </div>
+                                            <div>
+                                                <strong>Description:</strong> <?php echo nl2br(htmlspecialchars($idea['description'])); ?>
+                                            </div>
+
+                                            <!-- Like and dislike counts -->
+                                            <div style="margin-top: 5px;">
+                                                <span style="margin-right: 10px;">👍 Likes: <?php echo $idea['likes']; ?></span>
+                                                <span>👎 Dislikes: <?php echo $idea['dislikes']; ?></span>
+                                            </div>
+
+                                            <hr>
                                         </li>
                                     <?php endwhile; ?>
                                 </ul>
                             <?php else: ?>
                                 <div class="no-list">
                                     <img src="Images/no-list.png" alt="No-List">
-                                    <h3>There is no ideas submitted yet!</h3>
+                                    <h3>There are no ideas submitted yet!</h3>
                                 </div>
                             <?php endif; ?>
                         </div>

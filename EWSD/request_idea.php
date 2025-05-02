@@ -13,6 +13,16 @@ if (!isset($_SESSION['userID'])) {
     exit();
 }
 
+
+// Fetch the latest request idea
+$sql = "SELECT closure_date, final_closure_date FROM request_ideas ORDER BY requestIdea_id DESC LIMIT 1";
+$result = mysqli_query($connection, $sql);
+$request = mysqli_fetch_assoc($result);
+
+// Format for placeholder (optional: you can format it if needed)
+$closure_placeholder = isset($request['closure_date']) ? $request['closure_date'] : 'Closure Date';
+$final_closure_placeholder = isset($request['final_closure_date']) ? $request['final_closure_date'] : 'Final Closure Date';
+
 if (isset($_POST['btnPost'])) {
     $title = $_POST['txtTitle'];
     $closuredate = $_POST['closuredate'];
@@ -56,15 +66,16 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
     <div class="admin-container">
         <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link" href="admin_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link" href="staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
-            <a class="nav-link-active" href="request_idea.php">Request Idea</a>
+            <a class="nav-link-active" href="request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
             <a class="nav-link" href="idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
-            <a class="nav-link" href="register.php"><b>User Registration</b></a>
-            <a class="nav-link" href="change_password.php"><b>Change Password</b></a>
-            <a class="logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+            <a class="nav-link" href="register.php">User Registration</a>
+            <a class="nav-link" href="change_password.php">Change Password</a>
+            <a class="nav-link" href="department.php">Department</a>
+            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
         <div class="dash-section">
             <header class="dash-header">
@@ -84,14 +95,18 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
                     <div class="input-flex-box">
                         <div class="input-box">
                             <label for="closure-date">Closure Date</label>
-                            <input type="date" name="closuredate" placeholder="Closer Date">
+                            <small>Latest Closure Date: <?php echo $closure_placeholder; ?></small>
+                            <input type="date" name="closuredate">
                         </div>
 
                         <div class="input-box">
                             <label for="final-closure-date">Final Closure Date</label>
-                            <input type="date" name="finalclosuredate" placeholder="Final Closer Date">
+                            <small>Latest Final Closure Date: <?php echo $final_closure_placeholder; ?></small>
+                            <input type="date" name="finalclosuredate">
                         </div>
                     </div>
+
+
                     <div class="input-box">
                         <label for="title">Title</label>
                         <input type="text" name="txtTitle" placeholder="Closer Date">
