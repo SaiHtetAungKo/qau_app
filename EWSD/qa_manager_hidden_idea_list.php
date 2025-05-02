@@ -19,8 +19,18 @@ if (isset($_GET['msg']) && $_GET['msg'] == 'status_changed') {
     }
 }
 
-// get hidden idea from ideas table
-$hiddenQuery = "
+    if (isset($_GET['msg']) && $_GET['msg'] == 'status_changed') {
+        if (isset($_GET['status']) && $_GET['status'] == 'hide') {
+            echo "<div class='popup-message'>Idea has been successfully hidden</div>";
+        } elseif (isset($_GET['status']) && $_GET['status'] == 'active') {
+            echo "<div class='popup-message'>Idea has been successfully unhidden</div>";
+        }
+    }
+    $userName = $_SESSION['userName'];
+    $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
+    
+    // get hidden idea from ideas table
+    $hiddenQuery = "
         SELECT 
             i.idea_id,
             i.title AS idea_title,
@@ -30,7 +40,7 @@ $hiddenQuery = "
             sc.SubCategoryTitle,
             mc.MainCategoryTitle,
             d.department_name,
-            u.user_name,  -- Ensure user_name is included here
+            u.user_name, 
             COUNT(DISTINCT c.ideacommentID) AS comment_count,
             SUM(CASE WHEN v.votetype = 1 THEN 1 ELSE 0 END) AS upvotes,
             SUM(CASE WHEN v.votetype = 2 THEN 1 ELSE 0 END) AS downvotes
@@ -187,19 +197,20 @@ while ($row = mysqli_fetch_assoc($hiddenResult)) {
         }
 
         .dept-name {
-            font-weight: 400;
+            font-weight: 600;
             margin: 0;
-            color: rgb(74, 74, 74);
-            padding-bottom: 5px;
+            font-size: 13px;
+            color:#797979;
+            padding-bottom: 5px; 
         }
 
         .user-name {
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 16px;
             margin: 0;
-            color: rgb(82, 81, 81);
-            padding-bottom: 5px;
+            color:#313131;
+            padding-bottom: 5px; 
         }
-
         .date {
             color: gray;
             font-size: 14px;
@@ -332,6 +343,25 @@ while ($row = mysqli_fetch_assoc($hiddenResult)) {
             <a class="nav-link" href="qa_manager_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
             <a class="nav-link-active" href="qa_manager_hidden_idea_list.php"><i class="fa-regular fa-eye-slash"></i> Hidden Idea List</a>
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
+    </div>
+    <main class="content">
+    <div class="qa-manager-dash-section">
+        <header class="qa-manager-dash-header">
+            <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a>
+            <!-- <input type="hidden" placeholder="Search">                    -->
+            <div class="qa-manager-user-display">
+                <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
+                <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
+            </div>
+        </header>            
+    </div>
+    <!-- <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a> -->
+    <h2><span>Hidden Idea List</span></h2>
+
+    <!-- if no hidden ideas available, show msg -->
+    <?php if (empty($ideas)): ?>
+        <div class="no-ideas-message">
+            Currently, there are no hidden ideas.
         </div>
         <main class="content">
             <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a>
@@ -403,19 +433,61 @@ while ($row = mysqli_fetch_assoc($hiddenResult)) {
                         </div>
                     </div>
                 </div>
-                <div class="footer-section">
-                    <p class="note">You can download only after final closure date</p>
-                    <button class="download-btn">⬇️ Download</button>
+
+                <p class="idea-text"><?= htmlspecialchars($idea['idea_description']) ?></p>
+                
+        
+                <div class="reactions">
+                    <button><?= $idea['upvotes'] ?> 👍</button>
+                    <button><?= $idea['downvotes'] ?> 👎</button>
+                    <button onclick="openModal(<?= $idea['idea_id'] ?>)"><?= $idea['comment_count'] ?> 💬</button>
+
+                    <?php
+                    
+                        $idea_status = $idea['idea_status']; // 'active' or 'hide'
+
+                        if ($idea_status == 'hide') {
+                            // Show Unhide button
+                            echo '<a href="hidden_list_hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Unhide</a>';
+                        } else {
+                            // Show Hide button
+                            echo '<a href="hidden_list_hide_idea.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($idea['department_name']) . '" class="hide-idea-btn">Hide</a>';
+                        }
+                    ?>
                 </div>
         </main>
 
     </div>
 
-<?php endif; ?>
+        <!-- MODAL -->
+        <!-- MODAL -->
+        <div id="commentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; font-family:'Poppins', sans-serif;">
+            <div style="background:white; width:600px; max-width:90%; border-radius:10px; overflow:hidden;">
+                <div style="background:#1e1e1e; padding:20px; color:white;">
+                    <h3 style="margin:0; font-size:18px;">Comments</h3>
+                </div>
+                <div style="padding: 20px; max-height: 400px; overflow-y: auto;" id="commentContent">
+                    <!-- Comments will be injected here -->
+                </div>
+
+                <div style="text-align:right; padding: 10px 20px;">
+                    <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-section">
+                <p class="note">You can download only after final closure date</p>
+                <button class="download-btn">⬇️ Download</button>
+            </div>
+            </main>
+            
+        </div>
+
+    <?php endif; ?>
 <!-- JS for modal -->
 <script>
     const ideaData = <?= json_encode($ideas) ?>;
-
+    console.log(ideaData);
     function openModal(ideaId) {
         const idea = ideaData.find(i => i.idea_id == ideaId);
         const comments = idea.comment_texts?.split('||') || [];
@@ -441,7 +513,9 @@ while ($row = mysqli_fetch_assoc($hiddenResult)) {
             <hr>
             <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
         `;
-
+        if (uniqueComments.length === 0) {
+            html += `<p style="color: #666;">No comments yet.</p>`;
+        }
         uniqueComments.forEach((text, idx) => {
             html += `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 0;">

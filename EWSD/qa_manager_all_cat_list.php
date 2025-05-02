@@ -10,6 +10,13 @@ if (!isset($_SESSION['user'])) {
     echo "<script> window.location= 'index.php'; </script>";
     exit(); // Stop further code execution
 }
+
+if (isset($_GET['message'])) {
+    echo "<div class='popup-message'>   
+    " . htmlspecialchars($_GET['message']) . "
+    </div>";
+
+}
 $userName = $_SESSION['userName'];
 $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
 
@@ -23,8 +30,9 @@ $catQuery = "SELECT
             FROM maincategory mc
             LEFT JOIN subcategory sc ON sc.MainCategoryID = mc.MainCategoryID
             LEFT JOIN ideas i ON i.SubCategoryID = sc.SubCategoryID
+            WHERE mc.status != 'inactive'
             GROUP BY mc.MainCategoryID, mc.MainCategoryTitle
-            ORDER BY idea_count DESC";
+            ORDER BY idea_count DESC, mc.MainCategoryTitle ASC";
 
 $catResult = mysqli_query($connection, $catQuery);
 $allCategories = [];
@@ -40,7 +48,6 @@ while ($row = mysqli_fetch_assoc($catResult)) {
 <head>
     <meta charset="UTF-8">
     <title>QA Manager Category and Idea Report</title>
-    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -149,36 +156,24 @@ while ($row = mysqli_fetch_assoc($catResult)) {
             /* 3 columns in one row */
             gap: 20px;
         }
-
-        .category-card {
-            background: white;
-            color: black;
-            padding: 30px 20px;
-            border-radius: 10px;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .category-image {
-            width: 40px;
-            height: 40px;
-            border-radius: 5px;
+        .category-card { background: white; color: black; padding: 30px 20px; border-radius: 10px; position: relative; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+        .category-image { width: 40px; height: 40px; border-radius: 5px; margin-bottom: 10px; }
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
         }
 
-        .arrow,
-        .delete {
-            position: absolute;
-            right: 15px;
-            bottom: 15px;
-            font-size: 20px;
+        .delete-icon i {
+            color: #D72D31;
+            font-size: 16px;
             cursor: pointer;
+            margin-bottom: 10px;
         }
 
-        .delete {
-            color: red;
-        }
-
+        .arrow, .delete { position: absolute; right: 15px; bottom: 15px; font-size: 20px; cursor: pointer; }
+        .delete {   color: #D72D31; }
         /* Section visibility */
         #category-sections,
         #idea-report-section {
@@ -232,6 +227,12 @@ while ($row = mysqli_fetch_assoc($catResult)) {
             margin-bottom: 20px;
             text-decoration: none;
         }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
     </style>
 </head>
 
@@ -254,7 +255,7 @@ while ($row = mysqli_fetch_assoc($catResult)) {
             <div class="qa-manager-dash-section">
                 <header class="qa-manager-dash-header">
                     <a href="qa_manager_home.php" class="back-btn">← Back</a>
-                    <input type="text" placeholder="Search">
+                    <!-- <input type="hidden" placeholder="Search">                    -->
                     <div class="qa-manager-user-display">
                         <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
                         <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
@@ -274,8 +275,13 @@ while ($row = mysqli_fetch_assoc($catResult)) {
                 <div class="categories">
                     <?php foreach ($allCategories as $cat) { ?>
                         <div class="category-card">
-                            <img src="images/dummy_category.png" alt="" class="category-image">
-                            <h4>
+                            <div class="category-header">
+                                <img src="images/dummy_category.png" alt="" class="category-image">
+                                <span class="delete-icon" onclick="confirmDelete('<?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>', '<?php echo $cat['MainCategoryID']; ?>')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </span>
+                            </div>
+                            <h4>                           
                                 <?php echo htmlspecialchars($cat['MainCategoryTitle']); ?>
                             </h4>
                             <h4>
@@ -302,22 +308,22 @@ while ($row = mysqli_fetch_assoc($catResult)) {
                     const categoryId = this.getAttribute("data-category-id");
 
                     if (confirm("Are you sure you want to delete this category?")) {
-                        fetch('delete_category.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                },
-                                body: `category_id=${categoryId}`
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    // Reload just the unused categories section
-                                    location.reload(); // Or use AJAX to reload the section
-                                } else {
-                                    alert("Error deleting category: " + data.error);
-                                }
-                            });
+                        fetch('delete_status_category.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `category_id=${categoryId}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Reload just the unused categories section
+                                location.reload(); // Or use AJAX to reload the section
+                            } else {
+                                alert("Error deleting category: " + data.error);
+                            }
+                        });
                     }
                 });
             });
@@ -337,6 +343,28 @@ while ($row = mysqli_fetch_assoc($catResult)) {
             if (confirm('Do You Want To Log Out?')) {
                 window.location.href = 'logout.php';
             }
+        }
+
+        //delete function js
+        function confirmDelete(categoryTitle, categoryID) {
+            if (confirm("Are you sure you want to delete the " + categoryTitle + " category?")) {
+                deleteCategory(categoryID);
+            }
+        }
+
+        function deleteCategory(categoryID) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'delete_status_category.php';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'category_id';
+            input.value = categoryID;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
         }
     </script>
 

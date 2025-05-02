@@ -48,7 +48,7 @@ if ($data) {
         if ($roleID == '1') {
             header("location: admin_home.php");
         } elseif ($roleID == '2') {
-            header("location: qa_manager_home.php");
+            header("location: qa_manager_dashboard.php");
         } elseif ($roleID == '3') {
             header("location: qa_coordinator_home.php");
         } elseif ($roleID == '4') {

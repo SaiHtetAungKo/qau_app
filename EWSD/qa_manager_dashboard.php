@@ -4,20 +4,29 @@ include('connection.php');
 $connect = new Connect();
 $connection = $connect->getConnection();
 
-// Check if the user is logged in
-if (!isset($_SESSION['user'])) {
-    echo "<script> window.alert('Please Login First'); </script>";
-    echo "<script> window.location= 'index.php'; </script>";
-    exit(); // Stop further code execution
-}
-$userName = $_SESSION['userName'];
-$userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
+    // Check if the user is logged in
+    if (!isset($_SESSION['user'])) {
+        echo "<script> window.alert('Please Login First'); </script>";
+        echo "<script> window.location= 'index.php'; </script>";
+        exit(); // Stop further code execution
+    }
+    
+    if (isset($_GET['msg']) && $_GET['msg'] == 'status_changed') {
+        if (isset($_GET['status']) && $_GET['status'] == 'hide') {
+            echo "<div class='popup-message'>Idea has been successfully hidden</div>";
+        } elseif (isset($_GET['status']) && $_GET['status'] == 'active') {
+            echo "<div class='popup-message'>Idea has been successfully unhidden</div>";
+        }
+    }
 
-// category count
-$catSql = "SELECT COUNT(*) AS total_categories FROM maincategory";
-$catResult = mysqli_query($connection, $catSql);
-$catRow = mysqli_fetch_assoc($catResult);
-$categoryCount = $catRow['total_categories'];
+    $userName = $_SESSION['userName'];
+    $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
+
+    // category count
+    $catSql = "SELECT COUNT(*) AS total_categories FROM maincategory WHERE status != 'inactive'";
+    $catResult = mysqli_query($connection, $catSql);
+    $catRow = mysqli_fetch_assoc($catResult);
+    $categoryCount = $catRow['total_categories'];
 
 // department count
 $departmentSql = "SELECT COUNT(*) AS total_departments FROM departments";
@@ -37,6 +46,7 @@ $topQuery = "SELECT
         i.title,
         i.description,
         i.created_at,
+        u.user_name, 
         i.status,
         mc.MainCategoryTitle,
         sc.SubCategoryTitle,
@@ -57,14 +67,37 @@ $topQuery = "SELECT
     ORDER BY popularity_score DESC
     LIMIT 5";
 
-$topResult = mysqli_query($connection, $topQuery);
-$topIdeas = [];
-while ($row = mysqli_fetch_assoc($topResult)) {
-    $ideas[] = $row;
-}
-
-// New SQL query to fetch department idea data with contribution percentage
-$query = "
+    // $topResult = mysqli_query($connection, $topQuery);
+    // $topIdeas = [];
+    // while ($row = mysqli_fetch_assoc($topResult)) {
+    //     $ideas[] = $row;
+    // }
+    $topResult = mysqli_query($connection, $topQuery);
+    $ideas = [];
+    
+    while ($row = mysqli_fetch_assoc($topResult)) {
+        $ideaId = $row['idea_id'];
+    
+        // Fetch comments for this idea
+        $commentQuery = "SELECT ideacommentText, created_at FROM idea_comment WHERE idea_id = $ideaId ORDER BY created_at ASC";
+        $commentResult = mysqli_query($connection, $commentQuery);
+    
+        $commentTexts = [];
+        $commentDates = [];
+    
+        while ($comment = mysqli_fetch_assoc($commentResult)) {
+            $commentTexts[] = $comment['ideacommentText'];
+            $commentDates[] = $comment['created_at'];
+        }
+    
+        // Add them to current row
+        $row['ideacommentText'] = implode('||', $commentTexts);
+        $row['comment_dates'] = implode('||', $commentDates);
+    
+        $ideas[] = $row;
+    }
+    // New SQL query to fetch department idea data with contribution percentage
+    $query = "
         WITH department_idea_data AS (
         SELECT 
             d.department_id AS department_id,
@@ -103,7 +136,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 <head>
     <meta charset="UTF-8">
     <title>QA Manager Category and Idea Report</title>
-    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -410,6 +442,17 @@ while ($row = mysqli_fetch_assoc($result)) {
         .dept-name {
             font-weight: 600;
             margin: 0;
+            font-size: 13px;
+            color:#797979;
+            padding-bottom: 5px; 
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0;
+            color:#313131;
+            padding-bottom: 5px; 
             text-align: left;
         }
 
@@ -577,12 +620,14 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <div class="user-left">
                             <div class="avatar">👤</div>
                             <div>
+                                <p class="user-name"><?= htmlspecialchars($idea['user_name']) ?></p>
                                 <p class="dept-name"><?= htmlspecialchars($idea['department_name']) ?></p>
                                 <p class="date"><?= date("d.m.Y", strtotime($idea['created_at'])) ?></p>
                             </div>
                         </div>
                         <span class="subcategory"><?= htmlspecialchars($idea['SubCategoryTitle']) ?></span>
                     </div>
+                    
 
                     <p class="idea-text"><?= htmlspecialchars($idea['description']) ?></p>
 
@@ -609,8 +654,28 @@ while ($row = mysqli_fetch_assoc($result)) {
             <?php endforeach; ?>
         </main>
     </div>
+    
+    <!-- comment modal -->
+    <div id="commentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; font-family:'Poppins', sans-serif;">
+        <div style="background:white; width:600px; max-width:90%; border-radius:10px; overflow:hidden;">
+            <div style="background:#1e1e1e; padding:20px; color:white;">
+                <h3 style="margin:0; font-size:18px;">Comments</h3>
+            </div>
+            <div style="padding: 20px; max-height: 400px; overflow-y: auto;" id="commentContent">
+                <!-- Comments will be injected here -->
+            </div>
+            <!-- <div style="border-top: 1px solid #ccc; display: flex; align-items: center; padding: 20px; gap: 10px;">
+                <input type="text" placeholder="Leave your thoughts here" style="flex:1; padding: 14px; border: 1px solid #999; border-radius: 8px; font-family: 'Poppins', sans-serif;">
+                <button style="border: none; background: none; font-size: 24px; cursor: pointer;">📤</button>
+            </div> -->
+            <div style="text-align:right; padding: 10px 20px;">
+                <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
+            </div>
+        </div>
+    </div>
 
     <script>
+ 
         document.addEventListener("DOMContentLoaded", () => {
             const deletes = document.querySelectorAll(".delete");
 
@@ -620,24 +685,79 @@ while ($row = mysqli_fetch_assoc($result)) {
 
                     if (confirm("Are you sure you want to delete this category?")) {
                         fetch('delete_category.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                },
-                                body: `category_id=${categoryId}`
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    // Reload just the unused categories section
-                                    location.reload(); // Or use AJAX to reload the section
-                                } else {
-                                    alert("Error deleting category: " + data.error);
-                                }
-                            });
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `category_id=${categoryId}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload(); // reload page
+                            } else {
+                                alert("Error deleting category: " + data.error);
+                            }
+                        });
                     }
                 });
-            });
+            }); 
+ 
+            const ideaData = <?= json_encode($ideas ?? []) ?>;
+            console.log(ideaData);
+            
+            // Modal functions can be declared here or globally
+            window.openModal = function(ideaId) {
+                const idea = ideaData.find(i => i.idea_id == ideaId);
+                const comments = idea?.ideacommentText?.split('||') || [];
+                const dates = idea?.comment_dates?.split('||') || [];
+
+                const seen = new Set();
+                const uniqueComments = [];
+                const uniqueDates = [];
+
+                comments.forEach((comment, index) => {
+                    const commentText = comment?.trim();
+                    const commentDate = dates[index]?.trim();
+
+                    if (commentText && commentDate) {
+                        const key = commentText + commentDate;
+                        if (!seen.has(key)) {
+                            seen.add(key);
+                            uniqueComments.push(commentText);
+                            uniqueDates.push(commentDate);
+                        }
+                    }
+                });
+
+
+                let html = `<h2 style="margin: 0 0 10px 0; color: black;">Comments</h2><hr><div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">`;
+                if (uniqueComments.length === 0) {
+                    html += `<p style="color: #666;">No comments yet.</p>`;
+                }
+                uniqueComments.forEach((text, idx) => {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 0;">
+                            <div style="display: flex; gap: 15px;">
+                                <div style="width: 50px; height: 50px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">👤</div>
+                                <div>
+                                    <p style="margin: 0; font-weight: 600; color: #2e7166;">Department Name</p>
+                                    <p style="margin: 0; font-size: 14px; color: #444;">${text}</p>
+                                </div>
+                            </div>
+                            <p style="color: #666; font-size: 14px;">${new Date(uniqueDates[idx]).toLocaleDateString()}</p>
+                        </div>`;
+                });
+
+                html += `</div>`;
+
+                document.getElementById('commentContent').innerHTML = html;
+                document.getElementById('commentModal').style.display = 'flex';
+            };
+
+            window.closeModal = function() {
+                document.getElementById('commentModal').style.display = 'none';
+            };
         });
 
         function toggleCategories() {
@@ -655,6 +775,8 @@ while ($row = mysqli_fetch_assoc($result)) {
                 window.location.href = 'logout.php';
             }
         }
+        
+       
     </script>
 
 </body>

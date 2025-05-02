@@ -141,7 +141,7 @@ $result = $connection->query($query);
         <div class="dash-section">
             <header class="dash-header">
                 <div class="search-input">
-                    <input type="search" placeholder="Search" aria-label="Search">
+                    <input type="hidden" placeholder="Search" aria-label="Search">
                 </div>
                 <div class="user-display">
                     <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
