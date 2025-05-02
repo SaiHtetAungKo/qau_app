@@ -29,6 +29,11 @@ if (isset($_GET['error'])) {
 <body class="d-flex justify-content-center align-items-center vh-100 bg-light">
 
   <div class="login-container text-center">
+    <?php
+    if (isset($_GET['error']) && $_GET['error'] === 'deactivated') {
+      echo "<p style='color:red;'>Your account has been deactivated. Please contact an administrator.</p>";
+    }
+    ?>
     <h3>LOGIN</h3>
     <p>Dear, Please Login Here</p>
 

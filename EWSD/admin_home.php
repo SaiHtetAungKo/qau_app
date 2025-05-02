@@ -127,7 +127,7 @@ $result = mysqli_query($connection, $votequery);
                 </div> -->
         <div class="side-nav">
             <div class="logo text-center">
-                <h2>LOGO</h2>
+                <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
             </div>
             <a class="nav-link-active" href="admin_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a class="nav-link" href="staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>

@@ -50,72 +50,117 @@ if (isset($_POST['btnChangePsw'])) {
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Quality Assurance | Change Password</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="qa_script.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+<style>
+    .password-form {
+        max-width: 500px;
+        margin: 30px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        font-family: 'Segoe UI', sans-serif;
+        position: relative;
+    }
+
+    .password-form h3 {
+        text-align: center;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .password-form p {
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 14px;
+        color: #777;
+    }
+
+    .input-wrapper {
+        max-width: 600px;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .input-wrapper input {
+        width: 480px;
+        padding: 12px 0px 12px 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        top: 50%;
+        right: 17px;
+        transform: translateY(-50%);
+        color: #999;
+        cursor: pointer;
+    }
+
+    .btnChangePsw {
+        width: 100%;
+        padding: 12px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .btnChangePsw:hover {
+        background-color: #004b99;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: #0066cc;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
 
 <body>
-    <div class="admin-container">
-
-
-        <!-- <div class="nav flex-column gap-3 px-2 py-5 mh-100">
-            <div class="logo text-center">
-                <h2>LOGO</h2>
-            </div>
-            <div class="d-flex flex-column">
-                <a class="nav-link" href="register.php"><b>User Registration</b></a>
-                <a class="nav-link" href="change_password.php"><b>Change Password</b></a>
-
-                <a class="nav-link mt-auto bg-danger text-white rounded text-center" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
-            </div>
-        </div> -->
-        <div class="side-nav">
-            <div class="logo text-center">
-                <h2>LOGO</h2>
-            </div>
-            <a class="nav-link-active" href="admin_home.php"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a class="nav-link" href="staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
-            <a class="nav-link" href="request_idea.php"><i class="fa-regular fa-comment"></i> Request Idea</a>
-            <a class="nav-link" href="idea_report.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
-            <a class="nav-link" href="register.php">User Registration</a>
-            <a class="nav-link" href="change_password.php">Change Password</a>
-            <a class="nav-link" href="department.php">Department</a>
-            <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
-        </div>
-        <div class="dash-section">
-            <header class="dash-header">
-                <div class="search-input">
-                    <input type="search" placeholder="Search" aria-label="Search">
-                </div>
-                <div class="user-display">
-                    <img src="<?php echo htmlspecialchars($userProfileImg); ?>"
-                        alt="Profile Image">
-                    <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
-                </div>
-            </header>
-            <h3>Change Password</h3>
-            <p>Please remember your password</p>
-
-            <form action="change_password.php" method="POST">
+    <form class="password-form" action="change_password.php" method="POST">
+        <h3>Change Password</h3>
+        <p>Please remember your password</p>
+        <div style="display: flex; flex-direction:column;">
+            <div class="input-wrapper">
                 <input type="password" id="oldPswInput" name="txtOldPsw" placeholder="Old Password" required />
-                <i class="fa-solid fa-eye-low-vision" onclick="passwordVisibility('oldPswInput', this)"></i>
+                <i class="fa-solid fa-eye-slash" onclick="passwordVisibility('oldPswInput', this)"></i>
+            </div>
 
+            <div class="input-wrapper">
                 <input type="password" id="newPswInput" name="txtNewPsw" placeholder="New Password" required />
-                <i class="fa-solid fa-eye-low-vision" onclick="passwordVisibility('newPswInput', this)"></i>
+                <i class="fa-solid fa-eye-slash" onclick="passwordVisibility('newPswInput', this)"></i>
+            </div>
 
+            <div class="input-wrapper">
                 <input type="password" id="confirmPswInput" name="txtConfirmPsw" placeholder="Confirm Password" required />
-                <i class="fa-solid fa-eye-low-vision" onclick="passwordVisibility('confirmPswInput', this)"></i>
-
-                <button id="btnChangePsw" name="btnChangePsw" class="btnChangePsw">
-                    Change
-                </button>
-
-                <a href="admin_home.php"><b> Back to Home </b></a>
-            </form>
+                <i class="fa-solid fa-eye-slash" onclick="passwordVisibility('confirmPswInput', this)"></i>
+            </div>
         </div>
-    </div>
+        <button id="btnChangePsw" name="btnChangePsw" class="btnChangePsw">
+            Change Password
+        </button>
+
+        <a href="admin_home.php" class="back-link">← Back to Dashboard</a>
+    </form>
+
 </body>
+
+</html>

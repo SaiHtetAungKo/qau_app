@@ -24,6 +24,10 @@ $query = mysqli_query($connection, $select);
 $data = mysqli_fetch_array($query);
 
 if ($data) {
+    if ($data['account_status'] === 'deactivate') {
+        header("location: index.php?error=deactivated&email=" . urlencode($email));
+        exit();
+    }
     $userID = $data['user_id'];
     $userEmail = $data['user_email'];
     $userName = $data['user_name'];
@@ -44,7 +48,7 @@ if ($data) {
         if ($roleID == '1') {
             header("location: admin_home.php");
         } elseif ($roleID == '2') {
-            header("location: qa_manager_home.php");
+            header("location: qa_manager_dashboard.php");
         } elseif ($roleID == '3') {
             header("location: qa_coordinator_home.php");
         } elseif ($roleID == '4') {

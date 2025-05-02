@@ -12,6 +12,17 @@ require 'PHPMailer/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+<<<<<<< HEAD
+$connect = new Connect();
+$connection = $connect->getConnection();
+
+if (!isset($_SESSION['userID'])) {
+    echo "<script>
+        alert('Please Login First');
+        window.location = 'index.php';
+    </script>";
+    exit();
+=======
 $database = new Connect();
 $conn = $database->getConnection();
 
@@ -27,8 +38,30 @@ if ($qaCoordinatorRow = mysqli_fetch_assoc($qaCoordinatorResult)) {
 } else {
     // Handle case where no coordinator is found
     $qaCoordinatorEmail = null;
+>>>>>>> ab779039fe755b21edd578a7b023152b34e7b393
 }
+$user_id = $_SESSION['userID'];
+$userName = $_SESSION['userName'];
 
+<<<<<<< HEAD
+$isDisabled = false;
+
+if ($user_id) {
+    $query = "SELECT account_status FROM users WHERE user_id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user && $user['account_status'] !== 'active') {
+        $isDisabled = true;
+    }
+} else {
+    // User not logged in
+    $isDisabled = true;
+}
+=======
 // Handle AJAX request for subcategories
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['main_category_id'])) {
     $mainCatId = intval($_POST['main_category_id']);
@@ -60,6 +93,7 @@ if ($latestRequest) {
 
 $isDisabled = false;
 $user_id = $_SESSION['userID'];
+>>>>>>> ab779039fe755b21edd578a7b023152b34e7b393
 $userName = $_SESSION['userName'];
 if ($user_id) {
     $query = "SELECT account_status FROM users WHERE user_id = ?";
@@ -330,6 +364,20 @@ $mainCategories = mysqli_query($conn, "SELECT * FROM maincategory WHERE Status =
                 </div>
                 <div class="line-space"></div>
 
+<<<<<<< HEAD
+        <?php if ($isDisabled): ?>
+            <div class="alert alert-danger mt-2">Your account is not active. You cannot post ideas.</div>
+        <?php else: ?>
+        <form id="ideaForm" action="upload.php" method="POST" enctype="multipart/form-data" class="mt-3">
+            <div class="row form-row">
+                <!-- File Upload Box -->
+                <div class="col-md-6">
+                    <div class="upload-box" id="dropZone">
+                        <input type="file" id="fileInput" name="file" class="d-none" accept="image/*" />
+                        <div id="fileName">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <p>Drop Files to upload<br><small>(or click to select)</small></p>
+=======
                 <!-- Left Side: Image Upload -->
                 <div style="display: flex;">
                     <div class="left-side">
@@ -338,6 +386,7 @@ $mainCategories = mysqli_query($conn, "SELECT * FROM maincategory WHERE Status =
                                 <p>Drag & Drop File Here<br>or<br>Click to Upload</p>
                             </div>
                             <input type="file" name="idea_image" id="fileInput" style="display: none;">
+>>>>>>> ab779039fe755b21edd578a7b023152b34e7b393
                         </div>
                     </div>
 
@@ -386,7 +435,17 @@ $mainCategories = mysqli_query($conn, "SELECT * FROM maincategory WHERE Status =
                 </div>
             </div>
         </form>
+<<<<<<< HEAD
+        <?php endif; ?>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+=======
     <?php endif; ?>
+>>>>>>> ab779039fe755b21edd578a7b023152b34e7b393
     <script>
         // Drag and Drop Upload Handling
         const uploadArea = document.getElementById('uploadArea');

@@ -110,39 +110,90 @@ if (isset($_POST['btnUserRegister'])) {
         .invalid {
             color: red;
         }
+
+        .form-style {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 500px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 10px auto;
+        }
+
+        .form-style input[type="text"],
+        .form-style input[type="email"],
+        .form-style input[type="file"],
+        .form-style input[type="password"],
+        .form-style select {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-style label {
+            font-weight: bold;
+        }
+
+        .btnUserRegister {
+            background-color: #007bff;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btnUserRegister:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            margin-top: 10px;
+        }
     </style>
     <script src="qa_script.js"></script>
 </head>
 
 <body>
-    <h3>Registration</h3>
 
-    <form action="register.php" method="POST" enctype="multipart/form-data">
-        <input type="text" name="txtName" placeholder="Name" required /> <br>
 
-        <input type="file" id="file" name="userProfileImg" required> <br>
+    <form action="register.php" method="POST" enctype="multipart/form-data" class="form-style">
+        <h3 style="margin: 10px 0px;">User Registration</h3>
+        <p style="margin: 10px 0px;">Please fill in the form to register a new user.</p>
+        <label>Name</label>
+        <input type="text" name="txtName" placeholder="Full Name" required />
 
-        <input type="email" id="txtEmail" name="txtEmail" placeholder="Email" required onkeyup="validateEmailFormat()">
+        <label>Profile Image</label>
+        <input type="file" id="file" name="userProfileImg" required>
+
+        <label>Email</label>
+        <input type="email" name="txtEmail" placeholder="Email" required onkeyup="validateEmailFormat()">
         <p id="emailValidation"></p>
 
-        <input type="text" name="txtPhone" placeholder="Phone" required /> <br>
+        <label>Phone</label>
+        <input type="text" name="txtPhone" placeholder="Phone Number" required />
 
-        <label> Choose User Role</label><br>
-        <select class="register-cbo" name="cboRole">
+        <label>User Role</label>
+        <select name="cboRole" class="register-cbo" required>
             <?php echo $roleOptions; ?>
-        </select> <br>
+        </select>
 
-        <label> Choose User Department</label><br>
-        <select class="register-cbo" name="cboDep">
+        <label>Department</label>
+        <select name="cboDep" class="register-cbo" required>
             <?php echo $depOptions; ?>
-        </select> <br>
+        </select>
 
+        <label>Password</label>
+        <input type="password" name="txtPassword" placeholder="Password" required />
 
-
-        <input type="text" name="txtPassword" placeholder="Password" required />
-
-        <button type="submit" id="btnUserRegister" name="btnUserRegister" class="btnUserRegister">Register</button>
-        <p class="message">Back to <a href="admin_home.php"><b>Admin Dashboard </b></a></p>
+        <button type="submit" name="btnUserRegister" class="btnUserRegister">Register</button>
+        <p class="message">Back to <a href="admin_home.php"><b>Admin Dashboard</b></a></p>
     </form>
 </body>
 

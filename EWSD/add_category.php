@@ -25,7 +25,7 @@ if (isset($_POST['btnsubmit'])) {
   if ($count > 0) {
     echo "<script>window.alert('Main Category Title already exist !');</script>";
     echo "<script>window.location='add_category.php'</script>";
-  }   else {
+  } else {
     $Insert = "INSERT INTO MainCategory (MainCategoryTitle, Description, Status, created_at, updated_at)
       VALUES ('$MainCategoryTitle', '$Description', '$Status', NOW(), NOW())";
     $ret = mysqli_query($connection, $Insert);
@@ -44,7 +44,6 @@ if (isset($_POST['btnsubmit'])) {
       echo "<script>window.alert('Failed to insert main category.');</script>";
     }
   }
-
 }
 ?>
 <!DOCTYPE html>
@@ -57,7 +56,11 @@ if (isset($_POST['btnsubmit'])) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
 
     .container {
       max-width: 600px;
@@ -87,22 +90,37 @@ if (isset($_POST['btnsubmit'])) {
       border-radius: 10px;
       box-sizing: border-box;
     }
-    .logout { margin-top: auto; background: #3c9a72; padding: 12px; color: white; border: none; width: 100%; border-radius: 10px; cursor: pointer; font-size: 16px; }
-    .logout:hover { background: rgb(89, 64, 122); }
+
+    .logout {
+      margin-top: auto;
+      background: #3c9a72;
+      padding: 12px;
+      color: white;
+      border: none;
+      width: 100%;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .logout:hover {
+      background: rgb(89, 64, 122);
+    }
+
     .back-btn {
-            background-color: #A3E7D8;
-            color: black;
-            font-weight: 600;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            text-decoration: none;
-        }
+      background-color: #A3E7D8;
+      color: black;
+      font-weight: 600;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      text-decoration: none;
+    }
 
     .add-sub-btn {
       display: flex;
@@ -118,9 +136,28 @@ if (isset($_POST['btnsubmit'])) {
       border-radius: 10px;
       cursor: pointer;
     }
-    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
-        input[type="text"] { padding: 12px; width: 50%; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; }
-        .user-info { text-align: right; margin-right: 21px; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 12px;
+      width: 50%;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .user-info {
+      text-align: right;
+      margin-right: 21px;
+    }
+
     .add-sub-btn::before {
       content: "+";
       font-size: 1.5rem;
@@ -169,7 +206,15 @@ if (isset($_POST['btnsubmit'])) {
       font-weight: 500;
       transition: background-color 0.3s ease;
     }
-    .content { flex: 1; background: rgb(89, 64, 122); color: white; padding: 20px; overflow-y: auto; }
+
+    .content {
+      flex: 1;
+      background: rgb(89, 64, 122);
+      color: white;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
     .back-button:hover {
       background-color: #4a3a6b;
     }
@@ -179,12 +224,15 @@ if (isset($_POST['btnsubmit'])) {
 <body>
 
 <div class="admin-container">
-<div class="side-nav">
+        <div class="side-nav">
             <div class="logo text-center">
                 <h2>LOGO</h2>
             </div>
-            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-house"></i> Categories</a>
-            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-solid fa-users"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_manager_dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-layer-group"></i> Categories</a>
+            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_manager_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
+            <a class="nav-link" href="qa_manager_hidden_idea_list.php"><i class="fa-regular fa-eye-slash"></i> Hidden Idea List</a>
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
         
@@ -197,33 +245,33 @@ if (isset($_POST['btnsubmit'])) {
                 </div>
                 
             </header> -->
-            <a href="qa_manager_home.php" class="back-btn">← Back</a>
-          <h1>New Category Registration</h1>
-    <form action="add_category.php" method="POST">
-      <label for="mainCategory">Main Category</label>
-      <input type="text" id="mainCategory" name="mainCategory" placeholder="Enter your main category" required>
+      <a href="qa_manager_home.php" class="back-btn">← Back</a>
+      <h1>New Category Registration</h1>
+      <form action="add_category.php" method="POST">
+        <label for="mainCategory">Main Category</label>
+        <input type="text" id="mainCategory" name="mainCategory" placeholder="Enter your main category" required>
 
-      <label for="Description">Description</label>
-      <input type="text" id="Description" name="Description" placeholder="Enter your Description" required>
+        <label for="Description">Description</label>
+        <input type="text" id="Description" name="Description" placeholder="Enter your Description" required>
 
-      <label for="status">Status</label>
-      <input type="text" id="Status" name="Status" placeholder="Enter your Status" required>
+        <label for="status">Status</label>
+        <input type="text" id="Status" name="Status" placeholder="Enter your Status" required>
 
-      <label for="subCategory">Sub Category</label>
-      <input type="text" id="subCategory" name="subCategory[]" placeholder="Enter your sub category" required>
+        <label for="subCategory">Sub Category</label>
+        <input type="text" id="subCategory" name="subCategory[]" placeholder="Enter your sub category" required>
 
-      <label for="Sub-Description">Sub-Description</label>
-      <input type="text" id="Sub-Description" name="Sub-Description" placeholder="Enter your sub category" required>
+        <label for="Sub-Description">Sub-Description</label>
+        <input type="text" id="Sub-Description" name="Sub-Description" placeholder="Enter your sub category" required>
 
 
-      <button type="button" class="add-sub-btn" onclick="addSubCategory()">Add Another Sub Category</button>
+        <button type="button" class="add-sub-btn" onclick="addSubCategory()">Add Another Sub Category</button>
 
-      <button type="submit" name="btnsubmit" class="create-btn">Create</button>
-    </form>
-        </main>
-        
-        </div>
-  
+        <button type="submit" name="btnsubmit" class="create-btn">Create</button>
+      </form>
+    </main>
+
+  </div>
+
 
   <script>
     function addSubCategory() {
