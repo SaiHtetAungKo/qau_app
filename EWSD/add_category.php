@@ -264,7 +264,7 @@ if (isset($_POST['btnsubmit'])) {
         <input type="text" id="Sub-Description" name="Sub-Description" placeholder="Enter your sub category" required>
 
 
-        <button type="button" class="add-sub-btn" onclick="addSubCategory()">Add Another Sub Category</button>
+        <!-- <button type="button" class="add-sub-btn" onclick="addSubCategory()">Add Another Sub Category</button> -->
 
         <button type="submit" name="btnsubmit" class="create-btn">Create</button>
       </form>
