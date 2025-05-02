@@ -35,7 +35,7 @@ $query = "
         i.title,
         i.description,
         i.status,
-        i.anonymousSubmission,
+        i.anonymousSubmission,i.img_path,
         i.created_at,
         u.user_name,
         u.user_profile,
@@ -49,12 +49,13 @@ $query = "
             FROM idea_vote AS iv 
             WHERE iv.idea_id = i.idea_id AND iv.votetype = 2) AS unlike
     FROM ideas AS i
-    INNER JOIN users AS u ON i.userID = u.user_id
-
-    INNER JOIN departments AS d ON u.department_id = d.department_id
-    INNER JOIN roles r ON u.role_id = r.role_id
-    INNER JOIN subcategory sc ON i.SubCategoryID = sc.SubCategoryID
-    INNER JOIN maincategory mc ON mc.MainCategoryID = sc.MainCategoryID
+    LEFT JOIN users AS u ON i.userID = u.user_id
+    LEFT JOIN request_ideas AS ri ON i.requestIdea_id = ri.requestIdea_id
+    LEFT JOIN departments AS d ON u.department_id = d.department_id
+    LEFT JOIN roles r ON u.role_id = r.role_id
+    LEFT JOIN subcategory sc ON i.SubCategoryID = sc.SubCategoryID
+    LEFT JOIN maincategory mc ON mc.MainCategoryID = sc.MainCategoryID
+    
 ";
 
 // Modify query if a specific user ID is selected
