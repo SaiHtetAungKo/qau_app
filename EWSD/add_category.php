@@ -179,12 +179,15 @@ if (isset($_POST['btnsubmit'])) {
 <body>
 
 <div class="admin-container">
-<div class="side-nav">
+        <div class="side-nav">
             <div class="logo text-center">
                 <h2>LOGO</h2>
             </div>
-            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-house"></i> Categories</a>
-            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-solid fa-users"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_manager_dashboard.php"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a class="nav-link-active" href="qa_manager_home.php"><i class="fa-solid fa-layer-group"></i> Categories</a>
+            <a class="nav-link" href="qa_manager_idea_summary.php"><i class="fa-regular fa-lightbulb"></i> Idea Reports</a>
+            <a class="nav-link" href="qa_manager_staff_list.php"><i class="fa-solid fa-users"></i> Staff List</a>
+            <a class="nav-link" href="qa_manager_hidden_idea_list.php"><i class="fa-regular fa-eye-slash"></i> Hidden Idea List</a>
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
         

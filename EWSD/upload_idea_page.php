@@ -10,6 +10,9 @@ require 'PHPMailer/Exception.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+$connect = new Connect();
+$connection = $connect->getConnection();
+
 if (!isset($_SESSION['userID'])) {
     echo "<script>
         alert('Please Login First');
@@ -17,7 +20,26 @@ if (!isset($_SESSION['userID'])) {
     </script>";
     exit();
 }
+$user_id = $_SESSION['userID'];
+$userName = $_SESSION['userName'];
 
+$isDisabled = false;
+
+if ($user_id) {
+    $query = "SELECT account_status FROM users WHERE user_id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user && $user['account_status'] !== 'active') {
+        $isDisabled = true;
+    }
+} else {
+    // User not logged in
+    $isDisabled = true;
+}
 $userName = $_SESSION['userName'];
 $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
 
@@ -273,6 +295,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="text-end font-weight-bold">Closure Date: <span id="closureDate"></span></div>
         <hr />
 
+        <?php if ($isDisabled): ?>
+            <div class="alert alert-danger mt-2">Your account is not active. You cannot post ideas.</div>
+        <?php else: ?>
         <form id="ideaForm" action="upload.php" method="POST" enctype="multipart/form-data" class="mt-3">
             <div class="row form-row">
                 <!-- File Upload Box -->
@@ -316,6 +341,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
         </form>
+        <?php endif; ?>
     </div>
 
     <!-- Scripts -->

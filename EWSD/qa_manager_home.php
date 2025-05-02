@@ -10,6 +10,8 @@ if (!isset($_SESSION['user'])) {
     echo "<script> window.location= 'index.php'; </script>";
     exit(); // Stop further code execution
 }
+$userName = $_SESSION['userName'];
+$userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
 
 // 1. Top 3 Popular Categories
 $topQuery = "SELECT 
@@ -17,12 +19,13 @@ $topQuery = "SELECT
                 mc.MainCategoryTitle,
                 sc.SubCategoryTitle,
                 COUNT(i.idea_id) AS idea_count
-             FROM ideas i
-             JOIN subcategory sc ON i.SubCategoryID = sc.SubCategoryID
-             JOIN maincategory mc ON sc.MainCategoryID = mc.MainCategoryID
-             GROUP BY mc.MainCategoryID, mc.MainCategoryTitle
-             ORDER BY idea_count DESC
-             LIMIT 3";
+            FROM ideas i
+            JOIN subcategory sc ON i.SubCategoryID = sc.SubCategoryID
+            JOIN maincategory mc ON sc.MainCategoryID = mc.MainCategoryID
+            WHERE mc.status != 'inactive'
+            GROUP BY mc.MainCategoryID, mc.MainCategoryTitle
+            ORDER BY idea_count DESC
+            LIMIT 3";
 
 $topResult = mysqli_query($connection, $topQuery);
 $topCategories = [];
@@ -38,7 +41,7 @@ $unusedQuery = "SELECT
                 FROM maincategory mc
                 LEFT JOIN subcategory sc ON mc.MainCategoryID = sc.MainCategoryID
                 LEFT JOIN ideas i ON sc.SubCategoryID = i.SubCategoryID
-                WHERE i.idea_id IS NULL
+                WHERE i.idea_id IS NULL AND mc.status != 'inactive'
                 GROUP BY mc.MainCategoryID, mc.MainCategoryTitle";
 
 $unusedResult = mysqli_query($connection, $unusedQuery);
@@ -135,24 +138,43 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
 
         <main class="content">
-            <header>
-                <input type="text" placeholder="Search">
+            <!-- <header>
+                <input type="hidden" placeholder="Search">
                 <div class="user-info">
                     <span><strong>Name</strong></span><br>
                     <span>QA Manager</span>
                 </div>
                 <a href="add_category.php">Add new category</a>
-            </header>
-
+            </header> -->
+            <div class="qa-manager-dash-section">
+                <header class="qa-manager-dash-header">
+                    <div class="qa-manager-search-input">
+                        <input type="hidden" placeholder="Search" aria-label="Search">
+                    </div>
+                    <div class="qa-manager-user-display">
+                        <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
+                        <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
+                    </div>              
+                </header>            
+            </div>
             <!-- Category Section -->
             <div id="category-sections" style="display: block;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3>🔥 Top 3 Popular Categories</h3>
+                <!-- <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3> Top 3 Popular Categories</h3>
+                    <a href="add_category.php" class="view-all-cat">+ Add</a>
                     <a href="qa_manager_all_cat_list.php" class="view-all-cat">
                         View All <i class="fa-solid fa-arrow-right"></i>
-                    </a>
+                    </a>                    
+                </div> -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>🔥 Top 3 Popular Categories</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="add_category.php" class="view-all-cat">+ Add</a>
+                        <a href="qa_manager_all_cat_list.php" class="view-all-cat">
+                            View All <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
-
                 <div class="categories">
                     <?php foreach ($topCategories as $cat) { ?>
                         <div class="category-card">
@@ -226,34 +248,34 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     <script>
 
-document.addEventListener("DOMContentLoaded", () => {
-    const deletes = document.querySelectorAll(".delete");
+        document.addEventListener("DOMContentLoaded", () => {
+            const deletes = document.querySelectorAll(".delete");
 
-    deletes.forEach(btn => {
-        btn.addEventListener("click", function () {
-            const categoryId = this.getAttribute("data-category-id");
+            deletes.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const categoryId = this.getAttribute("data-category-id");
 
-            if (confirm("Are you sure you want to delete this category?")) {
-                fetch('delete_category.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `category_id=${categoryId}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Reload just the unused categories section
-                        location.reload(); // Or use AJAX to reload the section
-                    } else {
-                        alert("Error deleting category: " + data.error);
+                    if (confirm("Are you sure you want to delete this category?")) {
+                        fetch('delete_category.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `category_id=${categoryId}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Reload just the unused categories section
+                                location.reload(); // Or use AJAX to reload the section
+                            } else {
+                                alert("Error deleting category: " + data.error);
+                            }
+                        });
                     }
                 });
-            }
+            });
         });
-    });
-});
 
         function toggleCategories() {
             document.getElementById("category-sections").style.display = "block";

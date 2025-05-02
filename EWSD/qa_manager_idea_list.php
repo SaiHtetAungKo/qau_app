@@ -18,9 +18,10 @@ if (isset($_GET['msg']) && $_GET['msg'] == 'status_changed') {
     }
 }
 
-// $categoryId = $_GET['category_name'];
-$categoryName = mysqli_real_escape_string($connection, $_GET['category_name']);
-
+$categoryName = '';
+if (isset($_GET['category_name'])) {
+    $categoryName = mysqli_real_escape_string($connection, $_GET['category_name']);
+}
 
 
 // 1. Top 3 Popular Categories
@@ -28,6 +29,7 @@ $topQuery = "SELECT
         mc.MainCategoryTitle,
         sc.SubCategoryTitle,
         i.idea_id,
+        u.user_name, 
         i.title AS idea_title,
         i.description AS idea_description,
         i.status AS idea_status,
@@ -153,6 +155,18 @@ while ($row = mysqli_fetch_assoc($topResult)) {
         .dept-name {
             font-weight: 600;
             margin: 0;
+            font-size: 13px;
+            color:#797979;
+            padding-bottom: 5px; 
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0;
+            color:#313131;
+            padding-bottom: 5px; 
+            text-align: left;
         }
 
         .date {
@@ -279,73 +293,70 @@ while ($row = mysqli_fetch_assoc($topResult)) {
     <!-- if no hidden ideas available, show msg -->
 
     <?php if (empty($ideas)): ?>
-    <div class="no-ideas-message">
-        Currently, there are no ideas.
-    </div>
-<?php else: ?>
-    <?php foreach ($ideas as $idea): ?>
-        <?php if (!empty($idea['idea_id'])): ?>
-            <div class="card">
-                <div class="user-info">
-                    <div class="user-left">
-                        <div class="avatar">👤</div>
-                        <div>
-                            <p class="dept-name"><?= htmlspecialchars($idea['department_name']) ?></p>
-                            <p class="date"><?= date("d.m.Y", strtotime($idea['idea_created_at'])) ?></p>
+        <div class="no-ideas-message">
+            Currently, there are no ideas.
+        </div>
+    <?php else: ?>
+        <?php foreach ($ideas as $idea): ?>
+            <?php if (!empty($idea['idea_id'])): ?>
+                <div class="card">
+                    <div class="user-info">
+                        <div class="user-left">
+                            <div class="avatar">👤</div>
+                            <div>
+                                <p class="user-name"><?= htmlspecialchars($idea['user_name']) ?></p>
+                                <p class="dept-name"><?= htmlspecialchars($idea['department_name']) ?></p>
+                                <p class="date"><?= date("d.m.Y", strtotime($idea['idea_created_at'])) ?></p>
+                            </div>
                         </div>
+                        <span class="subcategory"><?= htmlspecialchars($idea['SubCategoryTitle']) ?></span>
                     </div>
-                    <span class="subcategory"><?= htmlspecialchars($idea['SubCategoryTitle']) ?></span>
+                    <p class="idea-text"><?= htmlspecialchars($idea['idea_description']) ?></p>
+
+                    <div class="reactions">
+                        <button><?= $idea['upvotes'] ?> 👍</button>
+                        <button><?= $idea['downvotes'] ?> 👎</button>
+                        <button onclick="openModal(<?= $idea['idea_id'] ?>)"><?= $idea['comment_count'] ?> 💬</button>
+                        <?php
+                            $idea_status = $idea['idea_status']; // 'active' or 'hide'               
+
+                            // Debugging the status
+                            if ($idea_status == 'hide') {
+                                // Show Unhide button
+                                echo '<a href="hide_idea_qa_mg_all_cat.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($categoryName) . '" class="hide-idea-btn">Unhide</a>';
+                            } else {
+                                // Show Hide button
+                                echo '<a href="hide_idea_qa_mg_all_cat.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($categoryName) . '" class="hide-idea-btn">Hide</a>';
+                            }
+                        ?>
+                    </div>
                 </div>
-                <p class="idea-text"><?= htmlspecialchars($idea['idea_description']) ?></p>
+            <?php endif; ?>
+        <?php endforeach; ?>
 
-                <div class="reactions">
-                    <button><?= $idea['upvotes'] ?> 👍</button>
-                    <button><?= $idea['downvotes'] ?> 👎</button>
-                    <button onclick="openModal(<?= $idea['idea_id'] ?>)"><?= $idea['comment_count'] ?> 💬</button>
-                    <?php
-                        $idea_status = $idea['idea_status']; // 'active' or 'hide'               
-
-                        // Debugging the status
-                        if ($idea_status == 'hide') {
-                            // Show Unhide button
-                            echo '<a href="hide_idea_qa_mg_all_cat.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($categoryName) . '" class="hide-idea-btn">Unhide</a>';
-                        } else {
-                            // Show Hide button
-                            echo '<a href="hide_idea_qa_mg_all_cat.php?id=' . urlencode($idea['idea_id']) . '&category_name=' . urlencode($categoryName) . '" class="hide-idea-btn">Hide</a>';
-                        }
-                    ?>
+        <!-- MODAL -->
+        <!-- MODAL -->
+        <div id="commentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; font-family:'Poppins', sans-serif;">
+            <div style="background:white; width:600px; max-width:90%; border-radius:10px; overflow:hidden;">
+                <div style="background:#1e1e1e; padding:20px; color:white;">
+                    <h3 style="margin:0; font-size:18px;">Comments</h3>
                 </div>
-            </div>
-        <?php endif; ?>
-    <?php endforeach; ?>
-
-
-    <!-- MODAL -->
-    <!-- MODAL -->
-    <div id="commentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; font-family:'Poppins', sans-serif;">
-        <div style="background:white; width:600px; max-width:90%; border-radius:10px; overflow:hidden;">
-            <div style="background:#1e1e1e; padding:20px; color:white;">
-                <h3 style="margin:0; font-size:18px;">Comments</h3>
-            </div>
-            <div style="padding: 20px; max-height: 400px; overflow-y: auto;" id="commentContent">
-                <!-- Comments will be injected here -->
-            </div>
-            <div style="border-top: 1px solid #ccc; display: flex; align-items: center; padding: 20px; gap: 10px;">
-                <input type="text" placeholder="Leave your thoughts here" style="flex:1; padding: 14px; border: 1px solid #999; border-radius: 8px; font-family: 'Poppins', sans-serif;">
-                <button style="border: none; background: none; font-size: 24px; cursor: pointer;">📤</button>
-            </div>
-            <div style="text-align:right; padding: 10px 20px;">
-                <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
+                <div style="padding: 20px; max-height: 400px; overflow-y: auto;" id="commentContent">
+                    <!-- Comments will be injected here -->
+                </div>
+               
+                <div style="text-align:right; padding: 10px 20px;">
+                    <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="footer-section">
-            <p class="note">You can download only after final closure date</p>
-            <button class="download-btn">⬇️ Download</button>
+        <div class="footer-section">
+                <p class="note">You can download only after final closure date</p>
+                <button class="download-btn">⬇️ Download</button>
+            </div>
+            </main>
+            
         </div>
-        </main>
-        
-    </div>
     <?php endif; ?>
 
 <!-- JS for modal -->
@@ -378,7 +389,9 @@ function openModal(ideaId) {
         <hr>
         <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
     `;
-
+    if (uniqueComments.length === 0) {
+            html += `<p style="color: #666;">No comments yet.</p>`;
+        }
     uniqueComments.forEach((text, idx) => {
         html += `
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 0;">

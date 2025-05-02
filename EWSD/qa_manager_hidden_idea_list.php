@@ -18,7 +18,9 @@
             echo "<div class='popup-message'>Idea has been successfully unhidden</div>";
         }
     }
-
+    $userName = $_SESSION['userName'];
+    $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
+    
     // get hidden idea from ideas table
     $hiddenQuery = "
         SELECT 
@@ -30,7 +32,7 @@
             sc.SubCategoryTitle,
             mc.MainCategoryTitle,
             d.department_name,
-            u.user_name,  -- Ensure user_name is included here
+            u.user_name, 
             COUNT(DISTINCT c.ideacommentID) AS comment_count,
             SUM(CASE WHEN v.votetype = 1 THEN 1 ELSE 0 END) AS upvotes,
             SUM(CASE WHEN v.votetype = 2 THEN 1 ELSE 0 END) AS downvotes
@@ -157,19 +159,20 @@
         }
 
         .dept-name {
-            font-weight: 400;
+            font-weight: 600;
             margin: 0;
-            color:rgb(74, 74, 74);
+            font-size: 13px;
+            color:#797979;
             padding-bottom: 5px; 
         }
 
         .user-name {
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 16px;
             margin: 0;
-            color:rgb(82, 81, 81);
+            color:#313131;
             padding-bottom: 5px; 
         }
-
         .date {
             color: gray;
             font-size: 14px;
@@ -285,7 +288,17 @@
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
     </div>
     <main class="content">
-    <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a>
+    <div class="qa-manager-dash-section">
+        <header class="qa-manager-dash-header">
+            <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a>
+            <!-- <input type="hidden" placeholder="Search">                    -->
+            <div class="qa-manager-user-display">
+                <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
+                <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
+            </div>
+        </header>            
+    </div>
+    <!-- <a href="qa_manager_idea_summary.php" class="back-btn">← Back</a> -->
     <h2><span>Hidden Idea List</span></h2>
 
     <!-- if no hidden ideas available, show msg -->
@@ -310,7 +323,7 @@
                     <span class="subcategory"><?= htmlspecialchars($idea['SubCategoryTitle']) ?></span>
                 </div>
 
-                <p class="idea-text">Good</p>
+                <p class="idea-text"><?= htmlspecialchars($idea['idea_description']) ?></p>
                 
         
                 <div class="reactions">
@@ -345,10 +358,7 @@
                 <div style="padding: 20px; max-height: 400px; overflow-y: auto;" id="commentContent">
                     <!-- Comments will be injected here -->
                 </div>
-                <div style="border-top: 1px solid #ccc; display: flex; align-items: center; padding: 20px; gap: 10px;">
-                    <input type="text" placeholder="Leave your thoughts here" style="flex:1; padding: 14px; border: 1px solid #999; border-radius: 8px; font-family: 'Poppins', sans-serif;">
-                    <button style="border: none; background: none; font-size: 24px; cursor: pointer;">📤</button>
-                </div>
+
                 <div style="text-align:right; padding: 10px 20px;">
                     <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
                 </div>
@@ -367,7 +377,7 @@
 <script>
 
     const ideaData = <?= json_encode($ideas) ?>;
-
+    console.log(ideaData);
     function openModal(ideaId) {
         const idea = ideaData.find(i => i.idea_id == ideaId);
         const comments = idea.comment_texts?.split('||') || [];
@@ -393,7 +403,9 @@
             <hr>
             <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
         `;
-
+        if (uniqueComments.length === 0) {
+            html += `<p style="color: #666;">No comments yet.</p>`;
+        }
         uniqueComments.forEach((text, idx) => {
             html += `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 0;">

@@ -25,9 +25,16 @@ if (isset($_GET['id']) && isset($_GET['category_name'])) {
     $result = mysqli_query($connection, $query);
 
     if ($result) {
-        header("Location: qa_manager_idea_list_department.php?msg=status_changed&category_name=" . urlencode($category_name) . "&status=" . $new_status);
+        $referer = $_SERVER['HTTP_REFERER'] ?? 'qa_manager_idea_list.php';
+    
+        // Append success message to the referer URL
+        $parsed_url = parse_url($referer);
+        $query_string = isset($parsed_url['query']) ? $parsed_url['query'] . '&' : '';
+        $redirect_url = $parsed_url['scheme'] . '://' . $parsed_url['host'] . $parsed_url['path'] . '?' . $query_string . 'msg=status_changed&status=' . $new_status;
+    
+        header("Location: $redirect_url");
         exit();
-    } else {
+    }else {
         echo "Error updating idea status.";
     }
 } else {
