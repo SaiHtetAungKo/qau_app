@@ -1,18 +1,20 @@
 <?php
-    include('connection.php');
-    $connect = new Connect(); 
-    $connection = $connect->getConnection(); 
+include('connection.php');
+$connect = new Connect();
+$connection = $connect->getConnection();
 
-    $idea_id = $_GET['idea_id'] ?? 0; // Get idea ID from request
-    $query = "SELECT * FROM comments WHERE idea_id = $idea_id ORDER BY created_at DESC";
-    $result = $connection->query($query);
+$idea_id = $_GET['idea_id'] ?? 0; // Get idea ID from request
+$query = "SELECT * FROM comments WHERE idea_id = $idea_id ORDER BY created_at DESC";
+$result = $connection->query($query);
+
+
 ?>
 
 <div id="commentModal" class="modal">
     <div class="modal-content">
         <header>
             <h2>Comments</h2>
-            <span id="finalClosureDate">{finalClosureDate}</span>
+            <span id="finalClosureDate"><?php echo htmlspecialchars($final_closure_date); ?></span>
         </header>
         <hr>
         <div class="comments-section">
