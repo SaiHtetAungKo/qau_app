@@ -33,9 +33,9 @@ if ($row = $result->fetch_assoc()) {
 if (isset($_POST['btnsubmit'])) {
   $announcetitle = $_POST['title'];
   $description = $_POST['description'];
-  $department_id = $_POST['d-id'];
+  $department_id = $_POST['d_id'];
 
-  $insert = "INSERT INTO annoucement(department_id, announce_title, description)
+  $insert = "INSERT INTO annoucement (department_id, announce_title, description)
             VALUES ('$department_id','$announcetitle','$description')";
   $ret = mysqli_query($connection, $insert);
   echo "<script>window.alert('Anounncement upload successfully!');</script>";
@@ -155,7 +155,7 @@ $userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default 
             <label for="description" name="a-title"><strong>Description</strong></label>
             <textarea id="description" name="description" rows="8" placeholder="Enter description..."></textarea>
 
-            <input type="hidden" name="d-id" value="<?php echo htmlspecialchars($departmentID); ?>">
+            <input type="hidden" name="d_id" value="<?php echo htmlspecialchars($departmentID); ?>">
 
             <button type="submit" name="btnsubmit">Post</button>
           </div>

@@ -97,8 +97,8 @@ $topQuery = "SELECT
         sc.SubCategoryTitle,
         i.idea_id
     ORDER BY 
-        mc.MainCategoryTitle, 
-        sc.SubCategoryTitle, 
+        -- mc.MainCategoryTitle, 
+        -- sc.SubCategoryTitle, 
         i.created_at DESC";
 
 $topResult = mysqli_query($connection, $topQuery);
@@ -217,7 +217,7 @@ $result = mysqli_query($connection, $votequery);
         <div class="dash-section">
             <header class="dash-header">
                 <div class="search-input">
-                    <input type="search" placeholder="Search" aria-label="Search">
+                    <input type="hidden" placeholder="Search" aria-label="Search">
                 </div>
                 <div class="user-display">
                     <img src="<?php echo htmlspecialchars($userProfileImg); ?>"
