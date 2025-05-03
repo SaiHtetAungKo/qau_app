@@ -103,7 +103,7 @@ $result = $stmt->get_result();
                                     <td><?php echo htmlspecialchars($row['department_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['created_at']); ?></td>
                                     <td>
-                                        <a href="editstaff.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
+                                        <a href="editstaffForCoordinator.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
                                         <a href="delete_staff.php?id=<?php echo $row['user_id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
                                     </td>
                                 </tr>
