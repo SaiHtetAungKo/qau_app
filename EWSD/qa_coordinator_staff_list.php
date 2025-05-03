@@ -68,9 +68,9 @@ $result = $stmt->get_result();
         </div>
         <div class="dash-section">
             <header class="dash-header">
-                <div class="search-input">
-                    <input type="hidden" placeholder="Search" aria-label="Search">
-                </div>
+            <div class="search-input">
+                    <h2 class="welcome-text">Dear Coordinator, Welcome to Open Gate University</h2>
+                </div>  
                 <div class="user-display">
                     <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
                     <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
