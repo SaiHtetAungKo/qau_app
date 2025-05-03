@@ -35,14 +35,19 @@ while ($row = mysqli_fetch_assoc($topResult)) {
 
 // 2. Unused Categories (No ideas at all)
 $unusedQuery = "SELECT 
-                   mc.MainCategoryID,
-                    sc.SubCategoryTitle,
-                   mc.MainCategoryTitle
-                FROM maincategory mc
-                LEFT JOIN subcategory sc ON mc.MainCategoryID = sc.MainCategoryID
-                LEFT JOIN ideas i ON sc.SubCategoryID = i.SubCategoryID
-                WHERE i.idea_id IS NULL AND mc.status != 'inactive'
-                GROUP BY mc.MainCategoryID, mc.MainCategoryTitle";
+    mc.MainCategoryID,
+    mc.MainCategoryTitle,
+    sc.SubCategoryTitle
+FROM maincategory mc
+LEFT JOIN subcategory sc ON mc.MainCategoryID = sc.MainCategoryID
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM subcategory s
+    JOIN ideas i ON s.SubCategoryID = i.SubCategoryID
+    WHERE s.MainCategoryID = mc.MainCategoryID
+)
+
+";
 
 $unusedResult = mysqli_query($connection, $unusedQuery);
 $unusedCategories = [];

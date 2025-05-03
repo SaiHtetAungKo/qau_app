@@ -59,7 +59,7 @@ $topQuery = "SELECT
         departments dp ON dp.department_id = u.department_id
 WHERE 
     mc.MainCategoryTitle = '$categoryName'
-    AND (i.status = 'active' OR i.status = 'hide')
+    AND (i.status = 'active' OR i.status = 'hide' OR i.status = 'pending')
     GROUP BY 
         mc.MainCategoryTitle,
         sc.SubCategoryTitle,
