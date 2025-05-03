@@ -50,7 +50,7 @@ $result = $connection->query($query);
         <div class="dash-section">
             <header class="dash-header">
                 <div class="search-input">
-                    <input type="search" placeholder="Search" aria-label="Search">
+                    <h2 class="welcome-text">Welcome to Open Gate University</h2>
                 </div>
                 <div class="user-display">
                     <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
@@ -73,26 +73,25 @@ $result = $connection->query($query);
                         </div>
                         <!-- Fetch ideas related to this request -->
                         <?php
-                        $requestIdea_id = $row['requestIdea_id'];
+                            $requestIdea_id = $row['requestIdea_id'];
 
-                        $ideasQuery = "
-SELECT i.idea_id, i.title, i.description, i.anonymousSubmission, i.created_at,
-       u.user_name, d.department_name,
-       COALESCE(SUM(CASE WHEN iv.votetype = 1 THEN 1 ELSE 0 END), 0) AS likes,
-       COALESCE(SUM(CASE WHEN iv.votetype = 2 THEN 1 ELSE 0 END), 0) AS dislikes
-FROM ideas i
-LEFT JOIN users u ON i.userID = u.user_id
-LEFT JOIN departments d ON u.department_id = d.department_id
-LEFT JOIN idea_vote iv ON i.idea_id = iv.idea_id
-WHERE i.requestIdea_id = ?
-GROUP BY i.idea_id
-ORDER BY i.created_at ASC
-";
+                            $ideasQuery = "
+                                SELECT i.idea_id, i.title, i.description, i.anonymousSubmission, i.created_at,
+                                    u.user_name, d.department_name,
+                                    COALESCE(SUM(CASE WHEN iv.votetype = 1 THEN 1 ELSE 0 END), 0) AS likes,
+                                    COALESCE(SUM(CASE WHEN iv.votetype = 2 THEN 1 ELSE 0 END), 0) AS dislikes
+                                FROM ideas i
+                                LEFT JOIN users u ON i.userID = u.user_id
+                                LEFT JOIN departments d ON u.department_id = d.department_id
+                                LEFT JOIN idea_vote iv ON i.idea_id = iv.idea_id
+                                WHERE i.requestIdea_id = ?
+                                GROUP BY i.idea_id
+                                ORDER BY i.created_at ASC ";
 
-                        $stmt = $connection->prepare($ideasQuery);
-                        $stmt->bind_param("i", $requestIdea_id);
-                        $stmt->execute();
-                        $ideasResult = $stmt->get_result();
+                            $stmt = $connection->prepare($ideasQuery);
+                            $stmt->bind_param("i", $requestIdea_id);
+                            $stmt->execute();
+                            $ideasResult = $stmt->get_result();
                         ?>
 
                         <div class="ideas-list">
