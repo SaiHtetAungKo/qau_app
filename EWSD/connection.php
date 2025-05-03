@@ -2,7 +2,7 @@
 	class Connect {
 		private $connection;
 		public function __construct() {
-			$this->connection = mysqli_connect('localhost', 'root', 'password', 'quality_assurance');
+			$this->connection = mysqli_connect('localhost', 'root', '', 'quality_assurance');
 			if (!$this->connection) {
 				die("Connection failed: " . mysqli_connect_error());
 			}
