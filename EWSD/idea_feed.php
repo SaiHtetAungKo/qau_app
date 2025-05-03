@@ -61,7 +61,7 @@ $query = "
 
 // Modify query if a specific user ID is selected
 if (!empty($userID)) {
-    $query .= " WHERE i.userID = ?";
+    $query .= " AND i.userID = ?";
 }
 
 // Set default sorting by idea_id and allow sorting by most_like if selected
