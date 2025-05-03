@@ -65,8 +65,8 @@ WHERE
         sc.SubCategoryTitle,
         i.idea_id
     ORDER BY 
-        mc.MainCategoryTitle, 
-        sc.SubCategoryTitle, 
+        -- mc.MainCategoryTitle, 
+        -- sc.SubCategoryTitle, 
         i.created_at DESC";
 
 $topResult = mysqli_query($connection, $topQuery);
