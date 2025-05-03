@@ -10,6 +10,7 @@ if (!isset($_SESSION['user'])) {
     echo "<script> window.location= 'index.php'; </script>";
     exit(); // Stop further code execution
 }
+$userName = $_SESSION['userName'];
 $userID = $_SESSION['userID'];
 // 1. Top 3 Popular Categories
 $topQuery = "SELECT 
@@ -297,14 +298,17 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
 
         <main class="content">
-            <header>
-                <input type="text" placeholder="Search">
-                <div class="user-info">
-                    <span><strong>Name</strong></span><br>
-                    <span>QA Coordinator</span>
-                </div>
-                <!-- <a href="add_category.php">Add new category</a> -->
-            </header>
+        <div class="qa-manager-dash-section">
+                <header class="qa-manager-dash-header">
+                    <div class="qa-manager-search-input">
+                        <input type="hidden" placeholder="Search" aria-label="Search">
+                    </div>
+                    <div class="qa-manager-user-display">
+                        <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
+                        <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
+                    </div>
+                </header>
+            </div>
 
             <!-- Category Section
             <div id="category-sections" style="display: block;">

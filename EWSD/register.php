@@ -116,7 +116,7 @@ if (isset($_POST['btnUserRegister'])) {
             flex-direction: column;
             gap: 10px;
             max-width: 500px;
-            background: #fff;
+            background: #59417B;
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -136,12 +136,19 @@ if (isset($_POST['btnUserRegister'])) {
 
         .form-style label {
             font-weight: bold;
+            color: #ffffff;
+        }
+
+        .form-style input {
+            margin-bottom: 5px;
         }
 
         .btnUserRegister {
-            background-color: #007bff;
-            color: white;
+            background-color:rgb(111, 193, 171);
+            color: #fff;
+            font-weight: 600;
             padding: 12px;
+            margin-top: 15px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
@@ -150,11 +157,18 @@ if (isset($_POST['btnUserRegister'])) {
         }
 
         .btnUserRegister:hover {
-            background-color: #0056b3;
+            background-color:rgb(113, 217, 189);
         }
 
         .message {
+            color: #eee;
             margin-top: 10px;
+        }
+        .admin-dash-link{
+            color: rgb(114, 197, 235);
+        }
+        .admin-dash-link:hover{
+            color: rgb(59, 184, 241);
         }
     </style>
     <script src="qa_script.js"></script>
@@ -164,8 +178,8 @@ if (isset($_POST['btnUserRegister'])) {
 
 
     <form action="register.php" method="POST" enctype="multipart/form-data" class="form-style">
-        <h3 style="margin: 10px 0px;">User Registration</h3>
-        <p style="margin: 10px 0px;">Please fill in the form to register a new user.</p>
+        <h3 style="margin: 7px 0px; color: #ffffff;">User Registration</h3>
+        <p style="margin: 5px 0px; color: #e1e1e1;">Please fill in the form to register a new user.</p>
         <label>Name</label>
         <input type="text" name="txtName" placeholder="Full Name" required />
 
@@ -193,7 +207,7 @@ if (isset($_POST['btnUserRegister'])) {
         <input type="password" name="txtPassword" placeholder="Password" required />
 
         <button type="submit" name="btnUserRegister" class="btnUserRegister">Register</button>
-        <p class="message">Back to <a href="admin_home.php"><b>Admin Dashboard</b></a></p>
+        <p class="message">Back to <a href="admin_home.php" class="admin-dash-link"><b>Admin Dashboard</b></a></p>
     </form>
 </body>
 
