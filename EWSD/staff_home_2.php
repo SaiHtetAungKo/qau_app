@@ -283,6 +283,18 @@ if ($closureCommentResult && $row = $closureCommentResult->fetch_assoc()) {
         .react-btn:hover{
             background-color: grey !important;
         }
+        .logout {
+            margin-top: auto;
+            color: #fff;
+            border-radius: 10px;
+            background-color: #3c9a72;
+            padding: 15px 0px;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: center;
+            border-radius: 10px;
+            text-decoration: none;
+        }
     </style>
 
 
@@ -293,13 +305,14 @@ if ($closureCommentResult && $row = $closureCommentResult->fetch_assoc()) {
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 sidebar d-flex flex-column m-3">
-                <h2>Logo<br>AppName</h2>
+                <span class="mb-5" style="background-color: white;"><img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;"></span>
                 <button class="btn btn-light side-btn active-nav-btn" onclick="sendRequest('','')">Idea Feed</button>
                 <button class="btn btn-light side-btn" onclick="sendRequest('contributions', '')">Contributions</button>
                 <button class="btn btn-light side-btn" onclick="sendRequest('', 'desc')">Most Liked</button>
                 <button class="btn btn-light side-btn" onclick="loadAnnouncements()">Announcements</button>
                 <div class="mt-auto text-center">
                     <p><strong><?php echo htmlspecialchars($userName); ?></strong><br>Department</p>
+                    <a class=" logout" type="button" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
                 </div>
             </div>
 
@@ -629,6 +642,8 @@ if ($closureCommentResult && $row = $closureCommentResult->fetch_assoc()) {
                     const container = document.getElementById('idea-container');
                     container.innerHTML = ''; // Clear existing content
                     // container.innerHTML = announcementHTML;
+                    const paginationContainer = document.getElementById('pagination-controls');
+                    paginationContainer.innerHTML = '';
 
                     if (data.request_idea) {
                         const announcementHTML = `

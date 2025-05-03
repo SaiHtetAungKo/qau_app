@@ -7,6 +7,16 @@ include 'connection.php';
 require 'PHPMailer/Exception.php';
 require 'PHPMailer/PHPMailer.php';
 require 'PHPMailer/SMTP.php';
+
+if (!isset($_SESSION['userID'])) {
+    echo "<script>
+        alert('Please Login First');
+        window.location = 'index.php';
+    </script>";
+    exit();
+}
+
+$sessionUserID = $_SESSION['userID'];
  
 // Use PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
@@ -83,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idea_title'])) {
     $title = mysqli_real_escape_string($conn, $_POST['idea_title']);
     $description = mysqli_real_escape_string($conn, $_POST['idea_description']);
     $anonymous = isset($_POST['anonymous']) ? 1 : 0;
-    $userID = 1; // Change to dynamic logged-in user ID if needed
+    $userID = $sessionUserID; // Change to dynamic logged-in user ID if needed
     $status = 'pending'; // or default value you use
     $imgPath = NULL;
  
@@ -323,7 +333,7 @@ $mainCategories = mysqli_query($conn, "SELECT * FROM maincategory WHERE Status =
                     <!-- Request Idea and Closure Date -->
                     <?php if ($latestRequest): ?>
                         <div class="request-idea-info">
-                            <?php echo "QA Coordinator email: " . $qaCoordinatorEmail; ?>
+                            <p style="width: 400px; word-wrap: break-word;">QA Coordinator Emails: <?= implode(', ', $qaCoordinatorEmails); ?></p>
                             <p><strong>Closure Date:</strong> <?= date('F j, Y', strtotime($closureDate)) ?></p>
                         </div>
                     <?php else: ?>

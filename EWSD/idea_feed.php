@@ -55,6 +55,7 @@ $query = "
     LEFT JOIN roles r ON u.role_id = r.role_id
     LEFT JOIN subcategory sc ON i.SubCategoryID = sc.SubCategoryID
     LEFT JOIN maincategory mc ON mc.MainCategoryID = sc.MainCategoryID
+    WHERE i.status = 'active'
     
 ";
 
