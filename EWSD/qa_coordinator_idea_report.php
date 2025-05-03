@@ -349,7 +349,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
             <!-- Idea Report Section -->
             <div id="idea-report-section">
-                <h2>Idea Reports by Each Department</h2>
+                <h2>Idea Reports</h2>
                 <div class="categories">
                     <?php foreach ($departments as $dept) { ?>
                         <div class="category-card">
