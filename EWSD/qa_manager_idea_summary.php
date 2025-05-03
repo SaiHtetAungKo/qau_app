@@ -338,9 +338,9 @@ $is_downloadable = ($latest_closure_date && $latest_closure_date <= $current_tim
             </header> -->
             <div class="qa-manager-dash-section">
                 <header class="qa-manager-dash-header">
-                    <div class="qa-manager-search-input">
-                        <input type="hidden" placeholder="Search" aria-label="Search">
-                    </div>
+                <div class="search-input">
+                    <h2 class="welcome-text">Dear Manager, Welcome to Open Gate University</h2>
+                </div>  
                     <div class="qa-manager-user-display">
                         <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
                         <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
