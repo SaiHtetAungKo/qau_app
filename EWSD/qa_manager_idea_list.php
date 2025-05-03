@@ -267,13 +267,6 @@ while ($row = mysqli_fetch_assoc($topResult)) {
             border-color: rgb(124, 91, 170);
         }
 
-        .footer-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 40px;
-        }
-
         .note {
             color: #DCD0F4;
             font-weight: 600;
@@ -402,13 +395,13 @@ while ($row = mysqli_fetch_assoc($topResult)) {
                 </div>
             </div>
         </div>
-        <div class="footer-section">
+        <!-- <div class="footer-section">
                 <p class="note">You can download only after final closure date</p>
-                <button class="download-btn">⬇️ Download</button>
+                <button class="download-btn"> Download</button>
             </div>
             </main>
             
-        </div>
+        </div> -->
     <?php endif; ?>
 
 <!-- JS for modal -->

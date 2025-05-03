@@ -64,8 +64,8 @@ $topQuery = "SELECT
         sc.SubCategoryTitle,
         i.idea_id
     ORDER BY 
-        -- mc.MainCategoryTitle, 
-        -- sc.SubCategoryTitle, 
+        mc.MainCategoryTitle, 
+        sc.SubCategoryTitle, 
         i.created_at DESC";
 
 $topResult = mysqli_query($connection, $topQuery);
@@ -403,13 +403,6 @@ while ($row = mysqli_fetch_assoc($topResult)) {
                     <button onclick="closeModal()" style="padding: 8px 16px; border: none; background: #ccc; border-radius: 6px; font-weight: 600; cursor:pointer;">Close</button>
                 </div>
             </div>
-        </div>
-        <div class="footer-section">
-                <p class="note">You can download only after final closure date</p>
-                <button class="download-btn">⬇️ Download</button>
-            </div>
-            </main>
-            
         </div>
     <?php endif; ?>
 

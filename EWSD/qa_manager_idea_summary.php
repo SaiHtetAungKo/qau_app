@@ -79,6 +79,37 @@ $departments = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $departments[] = $row;
 }
+// Query to get the latest final closure date
+// $closure_date_query = "
+//     SELECT MAX(final_closure_date) AS latest_closure_date
+//     FROM request_ideas
+// ";
+
+
+$current_time = date('Y-m-d H:i:s');
+$closure_date_query = "
+    SELECT final_closure_date AS latest_closure_date
+    FROM request_ideas 
+    ORDER BY requestIdea_id DESC 
+    LIMIT 1
+";
+// Execute the query
+$closure_date_result = mysqli_query($connection, $closure_date_query);
+
+if (!$closure_date_result) {
+    die("Error executing query: " . mysqli_error($connection));
+}
+
+// Fetch the latest closure date
+$closure_data = mysqli_fetch_assoc($closure_date_result);
+$latest_closure_date = $closure_data['latest_closure_date'];
+
+// Check if the button should be enabled
+$is_downloadable = ($latest_closure_date && $latest_closure_date <= $current_time);
+
+// echo "Current time: " . $current_time . "<br>";
+// echo "Latest closure date: " . $latest_closure_date . "<br>";
+// echo "Is downloadable? " . ($is_downloadable ? 'Yes' : 'No') . "<br>";
 ?>
 
 <!DOCTYPE html>
@@ -255,6 +286,19 @@ while ($row = mysqli_fetch_assoc($result)) {
             align-items: center;
             gap: 10px;
         }
+        .note {
+            color: #DCD0F4;
+            font-weight: 600;
+        }
+        .download-btn.disabled {
+            background-color: #e0e0e0;
+            color: #7a7a7a;
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.6;
+            border: 1px solid #ccc;
+            position: relative;
+        }
 
         .green-box {
             width: 40px;
@@ -263,6 +307,8 @@ while ($row = mysqli_fetch_assoc($result)) {
             border-radius: 12px;
             margin-bottom: 10px;
         }
+
+      
     </style>
 </head>
 
@@ -357,15 +403,35 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <?php } ?>
                 </div>
 
-                <div class="download-section">
+                <!-- <div class="download-section">
                     <p>You can download only after final closure date</p>
 
 
                     <form method="POST" action="download_csv.php">
                         <button type="submit" name="download_csv" class="download-btn">&#8681; Download</button>
                     </form>
-                </div>
+                </div> -->
+                <div class="download-section">
+                    <p class="note">
+                        You can only download after the final closure date:
 
+                        <?php
+                            if (!empty($latest_closure_date)) {
+                                echo date('d M Y', strtotime($latest_closure_date));
+                            } else {
+                                echo 'Unknown';
+                            }
+                        ?>                
+                    </p>      
+                    <?php if ($is_downloadable): ?>
+                        <form method="POST" action="download_csv.php">
+                            <button type="submit" name="download_csv" class="download-btn">&#8681; Download</button>
+                        </form>
+                    <?php else: ?>
+                        <button class="download-btn disabled" disabled>&#8681;  Download</button>  
+                            
+                    <?php endif; ?>
+                </div>
 
             </div>
         </main>
