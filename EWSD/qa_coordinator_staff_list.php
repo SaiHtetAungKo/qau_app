@@ -33,7 +33,8 @@ $query = "
     FROM users u
     INNER JOIN roles r ON u.role_id = r.role_id
     INNER JOIN departments d ON u.department_id = d.department_id
-    WHERE r.role_type = 'staff' AND u.department_id = ?
+    WHERE r.role_type = 'staff' AND u.department_id = ? AND u.account_status != 'deactivate'
+    
 ";
 $stmt = $connection->prepare($query);
 $stmt->bind_param('i', $userDepartmentId);
@@ -104,7 +105,7 @@ $result = $stmt->get_result();
                                     <td><?php echo htmlspecialchars($row['created_at']); ?></td>
                                     <td>
                                         <a href="editstaffForCoordinator.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
-                                        <a href="delete_staff.php?id=<?php echo $row['user_id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
+                                        <a href="deleteStaffForCordinator.php?id=<?php echo $row['user_id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
                                     </td>
                                 </tr>
                             <?php } ?>
