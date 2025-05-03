@@ -12,6 +12,7 @@ if (!isset($_SESSION['user'])) {
 }
 $userName = $_SESSION['userName'];
 $userID = $_SESSION['userID'];
+$userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
 // 1. Top 3 Popular Categories
 $topQuery = "SELECT 
                 mc.MainCategoryID,
@@ -303,10 +304,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <div class="search-input">
                     <h2 class="welcome-text">Dear Coordinator, Welcome to Open Gate University</h2>
                 </div>  
-                    <div class="qa-manager-user-display">
+                <div class="qa-manager-user-display">
                         <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
                         <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
-                    </div>
+                    </div>   
                 </header>
             </div>
 
