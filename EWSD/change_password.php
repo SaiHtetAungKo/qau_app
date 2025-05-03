@@ -63,9 +63,9 @@ if (isset($_POST['btnChangePsw'])) {
         padding: 30px;
         background: #fff;
         border-radius: 12px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
         font-family: 'Segoe UI', sans-serif;
         position: relative;
+        box-shadow: 0 12px 26px rgba(145, 68, 204, 0.3); 
     }
 
     .password-form h3 {
@@ -107,7 +107,7 @@ if (isset($_POST['btnChangePsw'])) {
     .btnChangePsw {
         width: 100%;
         padding: 12px;
-        background-color: #0066cc;
+        background-color:rgb(111, 85, 147);
         color: white;
         border: none;
         border-radius: 8px;
@@ -117,7 +117,7 @@ if (isset($_POST['btnChangePsw'])) {
     }
 
     .btnChangePsw:hover {
-        background-color: #004b99;
+        background-color:rgb(144, 109, 193);
     }
 
     .back-link {

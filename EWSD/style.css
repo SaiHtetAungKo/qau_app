@@ -135,6 +135,14 @@
     width: 100%;
     font-size: 16px;
 }
+.admin-container .dash-section .dash-header .search-input .welcome-text {
+  color: #f0eef1;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
 .admin-container .dash-section .dash-header .user-display{
     display: flex;
     margin-left: 20px;
@@ -149,6 +157,34 @@
 .admin-container .dash-section .dash-header .user-display .user-name{
     font-size: 16px;
     color: #fff;
+}
+.admin-container .dash-section .staff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.admin-container .dash-title {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.admin-container .filter-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-container .filter-box label {
+  font-weight: 500;
+  color: #e1e1e1;
+}
+
+.admin-container .filter-box select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 .admin-container .dash-section .dash-title{
     font-size: 18px;
@@ -514,6 +550,7 @@
 .department-table .action .edit-btn{
   color: #2F6CD0;
 }
+
 
 /* QA manager style start */
 .enable-staff-btn,

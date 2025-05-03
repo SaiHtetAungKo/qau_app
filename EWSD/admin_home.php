@@ -113,18 +113,6 @@ $result = mysqli_query($connection, $votequery);
 <body>
     <div class="admin-container">
 
-
-        <!-- <div class="nav flex-column gap-3 px-2 py-5 mh-100">
-                    <div class="logo text-center">
-                        <h2>LOGO</h2>
-                    </div>
-                    <div class="d-flex flex-column">
-                        <a class="nav-link" href="register.php"><b>User Registration</b></a>
-                        <a class="nav-link" href="change_password.php"><b>Change Password</b></a>
-
-                        <a class="nav-link mt-auto bg-danger text-white rounded text-center" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
-                    </div>
-                </div> -->
         <div class="side-nav">
             <div class="logo text-center">
                 <img src="Images/logo.png" alt="logo" width="150px" style="margin: 8px 0px;">
@@ -138,17 +126,19 @@ $result = mysqli_query($connection, $votequery);
             <a class="nav-link" href="department.php">Department</a>
             <a class=" logout" href="logout.php" onclick="return confirm('Do You Want To Log Out?')">Log Out</a>
         </div>
+
         <div class="dash-section">
             <header class="dash-header">
                 <div class="search-input">
-                    <input type="search" placeholder="Search" aria-label="Search">
-                </div>
+                    <h2 class="welcome-text">Welcome to Open Gate University</h2>
+                </div>            
                 <div class="user-display">
                     <img src="<?php echo htmlspecialchars($userProfileImg); ?>"
                         alt="Profile Image">
                     <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
                 </div>
             </header>
+            
             <h6 class="dash-title">All Data</h6>
             <div class="data-box">
                 <div class="box-card">
