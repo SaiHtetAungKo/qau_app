@@ -22,22 +22,30 @@ if (isset($_GET['id'])) {
         $user_email = mysqli_real_escape_string($connection, $_POST['user_email']);
         $user_phone = mysqli_real_escape_string($connection, $_POST['user_phone']);
         $department_id = intval($_POST['department_id']);
-        $user_profile = $_FILES['user_profile']['name'] ? $_FILES['user_profile']['name'] : $staff['user_profile'];
+        if (isset($_FILES['user_profile']) && $_FILES['user_profile']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['user_profile']['tmp_name'];
+            $fileName = $_FILES['user_profile']['name'];
+            $folder = "user_images/";
+            $user_profile = $folder . "_" . basename($fileName);
 
-        // If profile picture is updated
-        if ($_FILES['user_profile']['name']) {
-            move_uploaded_file($_FILES['user_profile']['tmp_name'], 'uploads/' . $user_profile);
+            if (!move_uploaded_file($fileTmpPath, $user_profile)) {
+                echo "<script>alert('Error uploading profile image');</script>";
+                exit();
+            }
+        } else {
+            // Use existing image if no new one is uploaded
+            $user_profile = $staff['user_profile'];
         }
 
         $update_sql = "
-            UPDATE users SET
-            user_name = '$user_name',
-            user_email = '$user_email',
-            user_phone = '$user_phone',
-            department_id = $department_id,
-            user_profile = '$user_profile'
-            WHERE user_id = $user_id
-        ";
+        UPDATE users SET
+        user_name = '$user_name',
+        user_email = '$user_email',
+        user_phone = '$user_phone',
+        department_id = $department_id,
+        user_profile = '$user_profile'
+        WHERE user_id = $user_id
+    ";
         if (mysqli_query($connection, $update_sql)) {
             header('Location: staff_list.php');  // Redirect back to staff list
         } else {

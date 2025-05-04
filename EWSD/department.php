@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="dash-section">
             <header class="dash-header">
                 <div class="search-input">
-                    <input type="search" placeholder="Search" aria-label="Search">
+                    <h2 class="welcome-text">Welcome to Open Gate University</h2>
                 </div>
                 <div class="user-display">
                     <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
