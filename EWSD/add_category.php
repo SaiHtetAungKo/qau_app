@@ -245,7 +245,14 @@ if (isset($_POST['btnsubmit'])) {
                 </div>
                 
             </header> -->
-      <a href="qa_manager_home.php" class="back-btn">← Back</a>
+     
+      <div class="search-input">
+        <span>
+        <a href="qa_manager_home.php" class="back-btn">← Back</a>
+        <h2 class="welcome-text">Dear Manager, Welcome to Open Gate University</h2>
+        </span>
+      
+                </div> 
       <h1>New Category Registration</h1>
       <form action="add_category.php" method="POST">
         <label for="mainCategory">Main Category</label>

@@ -55,12 +55,13 @@ $query = "
     LEFT JOIN roles r ON u.role_id = r.role_id
     LEFT JOIN subcategory sc ON i.SubCategoryID = sc.SubCategoryID
     LEFT JOIN maincategory mc ON mc.MainCategoryID = sc.MainCategoryID
+    WHERE i.status = 'active'
     
 ";
 
 // Modify query if a specific user ID is selected
 if (!empty($userID)) {
-    $query .= " WHERE i.userID = ?";
+    $query .= " AND i.userID = ?";
 }
 
 // Set default sorting by idea_id and allow sorting by most_like if selected

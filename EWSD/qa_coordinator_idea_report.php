@@ -12,6 +12,7 @@ if (!isset($_SESSION['user'])) {
 }
 $userName = $_SESSION['userName'];
 $userID = $_SESSION['userID'];
+$userProfileImg = $_SESSION['userProfile'] ?? 'default-profile.jpg'; // Default image if none is found
 // 1. Top 3 Popular Categories
 $topQuery = "SELECT 
                 mc.MainCategoryID,
@@ -300,13 +301,13 @@ while ($row = mysqli_fetch_assoc($result)) {
         <main class="content">
         <div class="qa-manager-dash-section">
                 <header class="qa-manager-dash-header">
-                    <div class="qa-manager-search-input">
-                        <input type="hidden" placeholder="Search" aria-label="Search">
-                    </div>
-                    <div class="qa-manager-user-display">
+                <div class="search-input">
+                    <h2 class="welcome-text">Dear Coordinator, Welcome to Open Gate University</h2>
+                </div>  
+                <div class="qa-manager-user-display">
                         <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
                         <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
-                    </div>
+                    </div>   
                 </header>
             </div>
 
@@ -348,7 +349,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
             <!-- Idea Report Section -->
             <div id="idea-report-section">
-                <h2>Idea Reports by Each Department</h2>
+                <h2>Idea Reports</h2>
                 <div class="categories">
                     <?php foreach ($departments as $dept) { ?>
                         <div class="category-card">

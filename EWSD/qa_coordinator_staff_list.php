@@ -33,7 +33,8 @@ $query = "
     FROM users u
     INNER JOIN roles r ON u.role_id = r.role_id
     INNER JOIN departments d ON u.department_id = d.department_id
-    WHERE r.role_type = 'staff' AND u.department_id = ?
+    WHERE r.role_type = 'staff' AND u.department_id = ? AND u.account_status != 'deactivate'
+    
 ";
 $stmt = $connection->prepare($query);
 $stmt->bind_param('i', $userDepartmentId);
@@ -68,9 +69,9 @@ $result = $stmt->get_result();
         </div>
         <div class="dash-section">
             <header class="dash-header">
-                <div class="search-input">
-                    <input type="hidden" placeholder="Search" aria-label="Search">
-                </div>
+            <div class="search-input">
+                    <h2 class="welcome-text">Dear Coordinator, Welcome to Open Gate University</h2>
+                </div>  
                 <div class="user-display">
                     <img src="<?php echo htmlspecialchars($userProfileImg); ?>" alt="Profile Image">
                     <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
@@ -103,8 +104,8 @@ $result = $stmt->get_result();
                                     <td><?php echo htmlspecialchars($row['department_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['created_at']); ?></td>
                                     <td>
-                                        <a href="editstaff.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
-                                        <a href="delete_staff.php?id=<?php echo $row['user_id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
+                                        <a href="editstaffForCoordinator.php?id=<?php echo $row['user_id']; ?>" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></a> |
+                                        <a href="deleteStaffForCordinator.php?id=<?php echo $row['user_id']; ?>" class="delete-btn" onclick="return confirm('Are you sure?')"><i class="fa-solid fa-trash"></i></a>
                                     </td>
                                 </tr>
                             <?php } ?>
