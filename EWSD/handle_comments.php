@@ -65,17 +65,47 @@ if ($action === 'submit') {
                VALUES ('$text', $user_id, $idea_id, $anon, '$now', '$now')";
     $conn->query($insert);
 
+    $fetchSql = "SELECT ic.ideacommentText, ic.user_id, ic.created_at, ic.anonymousSubmission,d.department_name,u.user_name,u.user_profile
+            FROM idea_comment ic 
+            LEFT JOIN users u ON ic.user_id = u.user_id
+            LEFT JOIN departments d ON u.department_id = d.department_id
+            WHERE ic.idea_id = $idea_id AND ic.user_id = $user_id
+            ORDER BY ic.ideacommentID DESC LIMIT 1";
+    $fetchResult = $conn->query($fetchSql);
+
+    while ($fetchRow = $fetchResult->fetch_assoc()) {
+        $user = ($fetchRow['anonymousSubmission'] == 1) ? 'Anonymous' : $fetchRow['department_name'];
+        $userName = ($fetchRow['anonymousSubmission'] == 1) ? '' : $fetchRow['user_name'];
+        $userProfile = ($fetchRow['anonymousSubmission'] == 1) ? 'Images/Default-avatar.png' : htmlspecialchars($fetchRow['user_profile']);
+        $text = htmlspecialchars($fetchRow['ideacommentText']);
+        $date = date('j.n.Y', strtotime($fetchRow['created_at']));
+
+        echo "
+        <div class='comment-entry'>
+            <div class='avatar'>
+                <img src='$userProfile' alt='Profile Image'>
+            </div>
+            <div class='flex-grow-1'>
+                <div class='dept-name'>$user</div>
+                <div class='dept-name'>$userName</div>
+                <div>$text</div>
+            </div>
+            <div class='date'>$date</div>
+        </div>";
+    }
+
+
     // Load and return just the newly added comment
-    $user = $anon ? 'Anonymous' : 'Your Department'; // You can fetch real department name too
-    echo "
-    <div class='comment-entry'>
-        <div class='profile-icon'>👤</div>
-        <div class='flex-grow-1'>
-            <div class='dept-name'>$user</div>
-            <div>" . htmlspecialchars($text) . "</div>
-        </div>
-        <div class='date'>" . date('j.n.Y') . "</div>
-    </div>";
+    // $user = $anon ? 'Anonymous' : 'Your Department'; // You can fetch real department name too
+    // echo "
+    // <div class='comment-entry'>
+    //     <div class='profile-icon'>👤</div>
+    //     <div class='flex-grow-1'>
+    //         <div class='dept-name'>$user</div>
+    //         <div>" . htmlspecialchars($text) . "</div>
+    //     </div>
+    //     <div class='date'>" . date('j.n.Y') . "</div>
+    // </div>";
 
     $idea_id = intval($idea_id); // sanitize input
     $getPostOwnerQuery = "SELECT userID FROM ideas WHERE idea_id = $idea_id";
