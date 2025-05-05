@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 05, 2025 at 05:19 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: May 05, 2025 at 07:02 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -383,12 +383,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `role_id`, `department_id`, `user_name`, `user_email`, `user_phone`, `user_password`, `user_profile`, `account_status`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 'James', 'jame@gmail.com', '+95 973823322', '$2y$10$pwZily1QdB4N1icgKNSicOtLDVOKBmEHnUV0dEb7xq9IludYIkGPC', 'user_images/_pfp1.jpg', 'active', '2025-02-28 07:28:17', '2025-05-03 14:07:42'),
 (2, 2, 1, 'John', 'john@gmail.com', '+95 9671564181', '$2y$10$1gjlE.6TiqoxKz.xMqdUQeleSyu7AFMfuJ3CdFC3OpeUEkdQSmtfy', 'user_images/_toji.jpg', 'active', '2025-03-01 18:19:38', '2025-04-05 14:57:27'),
 (17, 2, 1, 'bob', 'bob@gmail.com', '0564556456', '$2y$10$XhY95ruYBgLkwwoN5D.BO.eoqje3XzH8kLHmt4xowX62aBplAzhqe', 'user_images/_image.png', 'active', '2025-05-04 16:38:58', '2025-05-04 16:38:58'),
 (18, 3, 1, 'kitty', 'harrynyinyi183@gmail.com', '014564578', '$2y$10$4Hu.LB/4dNnCa3kpuyjAmOhHJ41i9hgsp/mmcINfAosLjOG7gbXPe', 'user_images/_kitty.jpg', 'active', '2025-05-04 16:40:32', '2025-05-04 16:40:32'),
 (19, 4, 1, 'Spider', 'harrynyinyi184@gmail.com', '09265645', '$2y$10$VY6cMDmferlJYDGu65GxqO.VnxUmPXO2d9Rvl6TjeVgsMDWUAVqs2', 'user_images/_png-transparent-spider-man-heroes-download-with-transparent-background-free-thumbnail.png', 'active', '2025-05-04 16:42:39', '2025-05-04 17:02:28'),
-(20, 4, 1, 'perry', 'perry@gmail.com', '089677566', '$2y$10$YxyGANH5t5JJ8.lIPOtrmuQU5MTHFJO1cIVJDV4iZO9ZtEkJZlGwC', 'user_images/_pic1.jpg', 'active', '2025-05-04 16:59:15', '2025-05-04 16:59:15');
+(20, 4, 1, 'perry', 'perry@gmail.com', '089677566', '$2y$10$YxyGANH5t5JJ8.lIPOtrmuQU5MTHFJO1cIVJDV4iZO9ZtEkJZlGwC', 'user_images/_pic1.jpg', 'active', '2025-05-04 16:59:15', '2025-05-04 16:59:15'),
+(100, 1, 3, 'Alvin', 'alvin@gmail.com', '0912345678', '$2b$12$3H7HyhOjV3GshZrBZ0qMquVRtJ09rhkTJ/Cf0jA2iTNGIOp0ivHgK\n', '', 'active', '2025-05-05 04:41:06', '2025-05-05 04:42:26'),
+(101, 1, 1, 'James', 'jame@gmail.com', '99888112223', '$2y$10$HkJghzn51Ai8b0Cj4b9vdOS3kEF8lPOXNjox67umCXOg6d.GlORkq', 'user_images/_cg.png', 'active', '2025-05-05 04:51:03', '2025-05-05 04:57:42');
 
 --
 -- Indexes for dumped tables
@@ -525,7 +526,7 @@ ALTER TABLE `subcategory`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- Constraints for dumped tables
